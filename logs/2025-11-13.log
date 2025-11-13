@@ -5576,3 +5576,16 @@
 {"timestamp":"2025-11-13T07:09:23.702Z","level":"INFO","message":"[server] Incoming request","meta":{"method":"GET","url":"/api/notifications/unread-count","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Qoder/0.2.13 Chrome/132.0.6834.210 Electron/34.5.1 Safari/537.36"},"pid":14748}
 {"timestamp":"2025-11-13T07:09:32.608Z","level":"INFO","message":"[server] Incoming request","meta":{"method":"GET","url":"/api/notifications/unread-count","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"},"pid":14748}
 {"timestamp":"2025-11-13T07:09:34.613Z","level":"INFO","message":"[server] Incoming request","meta":{"method":"GET","url":"/api/notifications/unread-count","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"},"pid":14748}
+{"timestamp":"2025-11-13T07:43:53.139Z","level":"WARN","message":"[server] Dist directory not found, skipping static file serving","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.247Z","level":"INFO","message":"[metrics-collection-service] Metrics collection service started","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.242Z","level":"INFO","message":"[scheduled-posting-service] Scheduled posting service started","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.267Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.254Z","level":"INFO","message":"[integration-monitoring-service] Integration monitoring service started","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.269Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.268Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.270Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.271Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.265Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:43:53.353Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":19676}
+{"timestamp":"2025-11-13T07:44:59.486Z","level":"INFO","message":"[server] Incoming request","meta":{"method":"GET","url":"/api/notifications/unread-count","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"},"pid":19676}
+{"timestamp":"2025-11-13T07:45:00.580Z","level":"INFO","message":"[server] Incoming request","meta":{"method":"GET","url":"/api/notifications/unread-count","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"},"pid":19676}

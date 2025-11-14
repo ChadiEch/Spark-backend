@@ -51,8 +51,8 @@ router.get('/metrics', authorize('admin'), (req, res) => {
   }
 });
 
-// POST /api/integrations/initialize - Initialize integrations collection
-router.post('/initialize', integrationController.initializeIntegrations);
+// POST /api/integrations/initialize - Initialize integrations collection (admin only)
+router.post('/initialize', authorize('admin'), integrationController.initializeIntegrations);
 
 // GET /api/integrations/metrics/health - Get integration health metrics
 router.get('/metrics/health', integrationController.getIntegrationMetrics);

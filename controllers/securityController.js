@@ -71,12 +71,8 @@ exports.changePassword = asyncHandler(async (req, res, next) => {
       throw new APIError('Current password is incorrect', 400);
     }
     
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-    
-    // Update password
-    user.password = hashedPassword;
+    // Update password - let the User model's pre-save hook handle hashing
+    user.password = newPassword; // Plain text password - will be hashed by User model pre-save hook
     await user.save();
     
     // Update security document with password change information
@@ -93,7 +89,7 @@ exports.changePassword = asyncHandler(async (req, res, next) => {
         security.passwordHistory = [];
       }
       security.passwordHistory.unshift({
-        password: user.password, // This is the old hashed password
+        password: user.password, // This is now the old hashed password after save
         changedAt: new Date()
       });
       // Keep only last 5 passwords

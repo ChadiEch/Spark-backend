@@ -114,7 +114,7 @@ app.use(monitoring);
 const corsOptions = {
   origin: process.env.NODE_ENV === 'development' 
     ? ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:8080', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8083', 'http://localhost:8084'] // Allow requests from common development ports
-    : '*', // In production, you might want to restrict this to specific domains
+    : ['https://spark-frontend-production.up.railway.app', 'https://spark-frontend-production-ab14.up.railway.app'], // In production, explicitly allow frontend origins
   credentials: true,
   optionsSuccessStatus: 200
 };

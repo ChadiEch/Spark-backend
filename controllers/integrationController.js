@@ -501,3 +501,103 @@ exports.getIntegrationMetrics = asyncHandler(async (req, res, next) => {
     throw new APIError('Failed to fetch integration metrics', 500);
   }
 });
+
+// @desc    Initialize integrations collection with default integrations
+// @route   POST /api/integrations/initialize
+// @access  Private (Admin only)
+exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
+  // Check if database is connected
+  if (!mongoose.connection.readyState) {
+    logger.warn('Database not available for initializeIntegrations request');
+    throw new APIError('Database not available', 503);
+  }
+  
+  try {
+    // Define the default integrations
+    const defaultIntegrations = [
+      {
+        name: 'Instagram',
+        description: 'Connect your Instagram Business account',
+        key: 'instagram',
+        icon: 'instagram',
+        category: 'social',
+        clientId: 'instagram_client_id',
+        clientSecret: 'instagram_client_secret',
+        redirectUri: 'http://localhost:5173/integrations/callback',
+        scopes: ['read', 'write'],
+        enabled: true
+      },
+      {
+        name: 'Facebook',
+        description: 'Manage Facebook Pages and ads',
+        key: 'facebook',
+        icon: 'facebook',
+        category: 'social',
+        clientId: '2302564490171864',
+        clientSecret: '46f1bebd6df4f4f8a3171e36e81c8981',
+        redirectUri: 'http://localhost:5173/integrations/callback',
+        scopes: ['read', 'write'],
+        enabled: true
+      },
+      {
+        name: 'TikTok',
+        description: 'Schedule and publish TikTok videos',
+        key: 'tiktok',
+        icon: 'tiktok',
+        category: 'social',
+        clientId: 'tiktok_client_id',
+        clientSecret: 'tiktok_client_secret',
+        redirectUri: 'http://localhost:5173/integrations/callback',
+        scopes: ['read', 'write'],
+        enabled: true
+      },
+      {
+        name: 'YouTube',
+        description: 'Upload and manage YouTube content',
+        key: 'youtube',
+        icon: 'youtube',
+        category: 'social',
+        clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
+        clientSecret: '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',
+        redirectUri: 'http://localhost:8080/integrations/callback',
+        scopes: [
+          'https://www.googleapis.com/auth/youtube',
+          'https://www.googleapis.com/auth/youtube.upload'
+        ],
+        enabled: true
+      },
+      {
+        name: 'Google Drive',
+        description: 'Connect your Google Drive for file storage and sharing',
+        key: 'google-drive',
+        icon: 'google-drive',
+        category: 'storage',
+        clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
+        clientSecret: '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',
+        redirectUri: 'http://localhost:8080/integrations/callback',
+        scopes: [
+          'https://www.googleapis.com/auth/drive'
+        ],
+        enabled: true
+      }
+    ];
+    
+    // Remove existing integrations
+    await Integration.deleteMany({});
+    
+    // Insert the default integrations
+    const integrations = await Integration.insertMany(defaultIntegrations);
+    
+    logger.info('Integrations collection initialized successfully', { count: integrations.length });
+    
+    res.status(200).json({
+      success: true,
+      message: 'Integrations collection initialized successfully',
+      count: integrations.length,
+      data: integrations
+    });
+  } catch (error) {
+    logger.error('Error initializing integrations collection', { error: error.message });
+    throw new APIError('Failed to initialize integrations collection', 500);
+  }
+});

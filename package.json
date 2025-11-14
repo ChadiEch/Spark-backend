@@ -14,7 +14,8 @@
     "test:clearCache": "jest --clearCache",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test:e2e": "cypress run"
+    "test:e2e": "cypress run",
+    "init-integrations": "node scripts/initializeIntegrations.js"
   },
   "dependencies": {
     "axios": "^1.13.2",

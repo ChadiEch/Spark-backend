@@ -27,10 +27,10 @@ const integrations = [
     key: 'instagram',
     icon: 'instagram',
     category: 'social',
-    clientId: 'instagram_client_id',
-    clientSecret: 'instagram_client_secret',
+    clientId: 'YOUR_INSTAGRAM_CLIENT_ID',
+    clientSecret: 'YOUR_INSTAGRAM_CLIENT_SECRET',
     redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
-    scopes: ['read', 'write'],
+    scopes: ['pages_show_list', 'instagram_basic', 'instagram_content_publish', 'pages_manage_posts'],
     enabled: true
   },
   {
@@ -39,10 +39,10 @@ const integrations = [
     key: 'facebook',
     icon: 'facebook',
     category: 'social',
-    clientId: 'facebook_client_id',
-    clientSecret: 'facebook_client_secret',
+    clientId: 'YOUR_FACEBOOK_CLIENT_ID',
+    clientSecret: 'YOUR_FACEBOOK_CLIENT_SECRET',
     redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
-    scopes: ['read', 'write'],
+    scopes: ['pages_show_list', 'pages_manage_posts', 'pages_read_engagement'],
     enabled: true
   },
   {
@@ -51,10 +51,10 @@ const integrations = [
     key: 'tiktok',
     icon: 'tiktok',
     category: 'social',
-    clientId: 'tiktok_client_id',
-    clientSecret: 'tiktok_client_secret',
+    clientId: 'YOUR_TIKTOK_CLIENT_KEY',
+    clientSecret: 'YOUR_TIKTOK_CLIENT_SECRET',
     redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
-    scopes: ['read', 'write'],
+    scopes: ['user.info.basic', 'video.list', 'video.upload'],
     enabled: true
   },
   {
@@ -63,10 +63,10 @@ const integrations = [
     key: 'youtube',
     icon: 'youtube',
     category: 'social',
-    clientId: 'youtube_client_id',
-    clientSecret: 'youtube_client_secret',
+    clientId: 'YOUR_YOUTUBE_CLIENT_ID',
+    clientSecret: 'YOUR_YOUTUBE_CLIENT_SECRET',
     redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
-    scopes: ['read', 'write'],
+    scopes: ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube'],
     enabled: true
   },
   {
@@ -75,10 +75,10 @@ const integrations = [
     key: 'google-drive',
     icon: 'google-drive',
     category: 'storage',
-    clientId: 'google-drive_client_id',
-    clientSecret: 'google-drive_client_secret',
+    clientId: 'YOUR_GOOGLE_DRIVE_CLIENT_ID',
+    clientSecret: 'YOUR_GOOGLE_DRIVE_CLIENT_SECRET',
     redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
-    scopes: ['read', 'write'],
+    scopes: ['https://www.googleapis.com/auth/drive.file'],
     enabled: true
   }
 ];

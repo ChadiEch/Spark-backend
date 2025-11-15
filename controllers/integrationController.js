@@ -197,7 +197,19 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   
   const { integrationId, code, redirectUri } = req.body;
   
+  logger.info('Exchange code request received', { 
+    integrationId, 
+    code: code ? 'present' : 'missing',
+    redirectUri,
+    userId: req.user.id
+  });
+  
   if (!integrationId || !code) {
+    logger.warn('Missing required parameters for token exchange', { 
+      integrationId: !!integrationId, 
+      code: !!code,
+      userId: req.user.id
+    });
     throw new APIError('Integration ID and authorization code are required', 400);
   }
   
@@ -212,25 +224,52 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   }
   
   if (!integration) {
-    logger.warn('Integration not found for token exchange', { integrationId });
+    logger.warn('Integration not found for token exchange', { integrationId, userId: req.user.id });
     throw new APIError('Integration not found', 404);
   }
+  
+  logger.info('Found integration for token exchange', { 
+    integrationKey: integration.key, 
+    integrationName: integration.name,
+    userId: req.user.id
+  });
   
   // Use the redirect URI from the request body, or fallback to the one from the integration config
   const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
   
-  // Exchange the code for tokens using the appropriate provider
-  const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
-  
-  // Create or update the connection
-  const connection = await createOrUpdateConnection(integration, req.user.id, tokenData);
-  
-  logger.info('Tokens exchanged successfully', { integrationId: integration._id, userId: req.user.id });
-  
-  res.status(200).json({
-    success: true,
-    data: connection
+  logger.info('Using redirect URI for token exchange', { 
+    finalRedirectUri, 
+    providedRedirectUri: redirectUri,
+    integrationRedirectUri: integration.redirectUri,
+    userId: req.user.id
   });
+  
+  try {
+    // Exchange the code for tokens using the appropriate provider
+    const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
+    
+    logger.info('Token exchange successful', { 
+      integrationKey: integration.key, 
+      userId: req.user.id
+    });
+    
+    // Create or update the connection
+    const connection = await createOrUpdateConnection(integration, req.user.id, tokenData);
+    
+    logger.info('Tokens exchanged successfully', { integrationId: integration._id, userId: req.user.id });
+    
+    res.status(200).json({
+      success: true,
+      data: connection
+    });
+  } catch (error) {
+    logger.error('Error during token exchange', { 
+      integrationKey: integration.key, 
+      error: error.message,
+      userId: req.user.id
+    });
+    throw error;
+  }
 });
 
 // @desc    Disconnect from an integration

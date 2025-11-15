@@ -25,10 +25,21 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
 
     let tokenResponse;
     
+    logger.info('Exchanging code for tokens', { 
+      integrationKey, 
+      code: code ? 'present' : 'missing',
+      redirectUri,
+      clientId: integration.clientId ? 'present' : 'missing'
+    });
+    
     switch (integrationKey) {
       case 'facebook':
       case 'instagram':
         // Facebook/Instagram token exchange
+        logger.info('Exchanging code with Facebook/Instagram', { 
+          clientId: integration.clientId,
+          redirectUri
+        });
         tokenResponse = await axios.post('https://graph.facebook.com/v18.0/oauth/access_token', {
           client_id: integration.clientId,
           client_secret: integration.clientSecret,
@@ -39,6 +50,10 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
         
       case 'tiktok':
         // TikTok token exchange
+        logger.info('Exchanging code with TikTok', { 
+          clientKey: integration.clientId,
+          redirectUri
+        });
         tokenResponse = await axios.post('https://open-api.tiktok.com/oauth/access_token/', {
           client_key: integration.clientId,
           client_secret: integration.clientSecret,
@@ -50,6 +65,10 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       case 'youtube':
       case 'google-drive':
         // Google OAuth token exchange
+        logger.info('Exchanging code with Google', { 
+          clientId: integration.clientId,
+          redirectUri
+        });
         tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
           client_id: integration.clientId,
           client_secret: integration.clientSecret,
@@ -63,6 +82,14 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
         throw new Error(`Unsupported integration: ${integrationKey}`);
     }
     
+    logger.info('Token exchange response received', { 
+      integrationKey, 
+      status: tokenResponse.status,
+      dataKeys: Object.keys(tokenResponse.data),
+      hasAccessToken: !!tokenResponse.data.access_token,
+      hasRefreshToken: !!tokenResponse.data.refresh_token
+    });
+    
     // Record successful API call
     recordAPICall(integrationKey, 'oauth/token', Date.now() - startTime, true);
     
@@ -74,7 +101,8 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
     logger.error('Error exchanging OAuth code for tokens', { 
       integrationKey, 
       error: error.message,
-      response: error.response?.data
+      response: error.response?.data,
+      status: error.response?.status
     });
     throw error;
   }
@@ -164,6 +192,15 @@ const refreshOAuthTokens = async (integrationKey, refreshToken) => {
  */
 const createOrUpdateConnection = async (integration, userId, tokenData) => {
   try {
+    logger.info('Creating or updating integration connection', { 
+      integrationId: integration._id, 
+      integrationKey: integration.key,
+      userId,
+      tokenDataKeys: Object.keys(tokenData),
+      hasAccessToken: !!tokenData.access_token,
+      hasRefreshToken: !!tokenData.refresh_token
+    });
+    
     // Calculate expiration time
     const expiresAt = tokenData.expires_in 
       ? new Date(Date.now() + (tokenData.expires_in * 1000))
@@ -190,18 +227,29 @@ const createOrUpdateConnection = async (integration, userId, tokenData) => {
     });
 
     if (connection) {
+      logger.info('Updating existing integration connection', { 
+        connectionId: connection._id,
+        integrationId: integration._id, 
+        userId 
+      });
       // Update existing connection
       Object.assign(connection, connectionData);
       await connection.save();
       logger.info('Updated existing integration connection', { 
+        connectionId: connection._id,
         integrationId: integration._id, 
         userId 
       });
     } else {
+      logger.info('Creating new integration connection', { 
+        integrationId: integration._id, 
+        userId 
+      });
       // Create new connection
       connection = new IntegrationConnection(connectionData);
       await connection.save();
       logger.info('Created new integration connection', { 
+        connectionId: connection._id,
         integrationId: integration._id, 
         userId 
       });

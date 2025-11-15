@@ -235,7 +235,8 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   });
   
   // Use the redirect URI from the request body, or fallback to the one from the integration config
-  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
+  // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
+  const finalRedirectUri = redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
   
   logger.info('Using redirect URI for token exchange', { 
     finalRedirectUri, 
@@ -256,7 +257,11 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     // Create or update the connection
     const connection = await createOrUpdateConnection(integration, req.user.id, tokenData);
     
-    logger.info('Tokens exchanged successfully', { integrationId: integration._id, userId: req.user.id });
+    logger.info('Tokens exchanged successfully and connection saved to database', { 
+      integrationId: integration._id, 
+      userId: req.user.id,
+      connectionId: connection._id
+    });
     
     res.status(200).json({
       success: true,
@@ -266,6 +271,7 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     logger.error('Error during token exchange', { 
       integrationKey: integration.key, 
       error: error.message,
+      stack: error.stack,
       userId: req.user.id
     });
     throw error;
@@ -565,7 +571,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: 'instagram_client_id',
         clientSecret: 'instagram_client_secret',
-        redirectUri: 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -577,7 +583,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: '2302564490171864',
         clientSecret: '46f1bebd6df4f4f8a3171e36e81c8981',
-        redirectUri: 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -589,7 +595,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: 'tiktok_client_id',
         clientSecret: 'tiktok_client_secret',
-        redirectUri: 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -601,7 +607,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
         clientSecret: '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',
-        redirectUri: 'http://localhost:8080/integrations/callback',
+        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/youtube',
           'https://www.googleapis.com/auth/youtube.upload'
@@ -616,7 +622,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'storage',
         clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
         clientSecret: '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',
-        redirectUri: 'http://localhost:8080/integrations/callback',
+        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/drive'
         ],

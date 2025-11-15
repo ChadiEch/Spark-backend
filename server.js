@@ -50,7 +50,7 @@ const initializeIntegrationsIfNeeded = async () => {
           category: 'social',
           clientId: process.env.INSTAGRAM_CLIENT_ID || 'instagram_client_id',
           clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'instagram_client_secret',
-          redirectUri: 'http://localhost:5173/integrations/callback',
+          redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
           scopes: ['read', 'write'],
           enabled: true
         },
@@ -62,7 +62,7 @@ const initializeIntegrationsIfNeeded = async () => {
           category: 'social',
           clientId: process.env.FACEBOOK_CLIENT_ID || '2302564490171864',
           clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '46f1bebd6df4f4f8a3171e36e81c8981',
-          redirectUri: 'http://localhost:5173/integrations/callback',
+          redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
           scopes: ['read', 'write'],
           enabled: true
         },
@@ -74,7 +74,7 @@ const initializeIntegrationsIfNeeded = async () => {
           category: 'social',
           clientId: process.env.TIKTOK_CLIENT_KEY || 'tiktok_client_id',
           clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'tiktok_client_secret',
-          redirectUri: 'http://localhost:5173/integrations/callback',
+          redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
           scopes: ['read', 'write'],
           enabled: true
         },
@@ -86,7 +86,7 @@ const initializeIntegrationsIfNeeded = async () => {
           category: 'social',
           clientId: process.env.YOUTUBE_CLIENT_ID || '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
           clientSecret: process.env.YOUTUBE_CLIENT_SECRET || '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',
-          redirectUri: 'http://localhost:8080/integrations/callback',
+          redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
           scopes: [
             'https://www.googleapis.com/auth/youtube',
             'https://www.googleapis.com/auth/youtube.upload'
@@ -101,7 +101,7 @@ const initializeIntegrationsIfNeeded = async () => {
           category: 'storage',
           clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
           clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || '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',
-          redirectUri: 'http://localhost:8080/integrations/callback',
+          redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
           scopes: [
             'https://www.googleapis.com/auth/drive'
           ],

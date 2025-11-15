@@ -201,6 +201,11 @@ const createOrUpdateConnection = async (integration, userId, tokenData) => {
       hasRefreshToken: !!tokenData.refresh_token
     });
     
+    // Validate required token data
+    if (!tokenData.access_token) {
+      throw new Error('Access token is missing from OAuth response');
+    }
+    
     // Calculate expiration time
     const expiresAt = tokenData.expires_in 
       ? new Date(Date.now() + (tokenData.expires_in * 1000))
@@ -248,7 +253,7 @@ const createOrUpdateConnection = async (integration, userId, tokenData) => {
       // Create new connection
       connection = new IntegrationConnection(connectionData);
       await connection.save();
-      logger.info('Created new integration connection', { 
+      logger.info('Created new integration connection and saved to database', { 
         connectionId: connection._id,
         integrationId: integration._id, 
         userId 
@@ -263,7 +268,8 @@ const createOrUpdateConnection = async (integration, userId, tokenData) => {
     logger.error('Error creating/updating integration connection', { 
       integrationId: integration._id, 
       userId, 
-      error: error.message 
+      error: error.message,
+      stack: error.stack
     });
     throw error;
   }

@@ -25,30 +25,35 @@ const integrationUpdates = [
     key: 'instagram',
     clientId: process.env.INSTAGRAM_CLIENT_ID || 'YOUR_INSTAGRAM_CLIENT_ID',
     clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'YOUR_INSTAGRAM_CLIENT_SECRET',
+    redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
     scopes: ['pages_show_list', 'instagram_basic', 'instagram_content_publish', 'pages_manage_posts']
   },
   {
     key: 'facebook',
-    clientId: process.env.FACEBOOK_CLIENT_ID || '2302564490171864',
+    clientId: process.env.FACEBOOK_CLIENT_ID || 'YOUR_FACEBOOK_CLIENT_ID',
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'YOUR_FACEBOOK_CLIENT_SECRET',
+    redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
     scopes: ['pages_show_list', 'pages_manage_posts', 'pages_read_engagement']
   },
   {
     key: 'tiktok',
     clientId: process.env.TIKTOK_CLIENT_KEY || 'YOUR_TIKTOK_CLIENT_KEY',
     clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'YOUR_TIKTOK_CLIENT_SECRET',
+    redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
     scopes: ['user.info.basic', 'video.list', 'video.upload']
   },
   {
     key: 'youtube',
-    clientId: process.env.YOUTUBE_CLIENT_ID || '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
+    clientId: process.env.YOUTUBE_CLIENT_ID || 'YOUR_YOUTUBE_CLIENT_ID',
     clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'YOUR_YOUTUBE_CLIENT_SECRET',
+    redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
     scopes: ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube']
   },
   {
     key: 'google-drive',
-    clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
+    clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'YOUR_GOOGLE_DRIVE_CLIENT_ID',
     clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'YOUR_GOOGLE_DRIVE_CLIENT_SECRET',
+    redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback',
     scopes: ['https://www.googleapis.com/auth/drive.file']
   }
 ];
@@ -65,21 +70,23 @@ const updateIntegrations = async () => {
         // Update the integration with new credentials
         integration.clientId = update.clientId;
         integration.clientSecret = update.clientSecret;
+        integration.redirectUri = update.redirectUri;
         integration.scopes = update.scopes;
         
         await integration.save();
-        console.log(`Updated ${update.key} integration`);
+        console.log(`Updated ${integration.name} integration`);
       } else {
         console.log(`Integration with key ${update.key} not found`);
       }
     }
     
-    console.log('Integration updates completed');
+    console.log('Integration update completed successfully');
     process.exit(0);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error('Error updating integrations:', error);
     process.exit(1);
   }
 };
 
+// Run the update function
 updateIntegrations();

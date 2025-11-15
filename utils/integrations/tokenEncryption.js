@@ -42,12 +42,13 @@ const decryptToken = (encryptedToken) => {
 /**
  * Hash a client secret for secure storage
  * @param {string} secret - The client secret to hash
- * @returns {Promise<string>} - The hashed secret
+ * @returns {string} - The hashed secret
  */
-const hashClientSecret = async (secret) => {
+const hashClientSecret = (secret) => {
   try {
     const saltRounds = 12;
-    return await bcrypt.hash(secret, saltRounds);
+    // Use sync version for mongoose setters
+    return bcrypt.hashSync(secret, saltRounds);
   } catch (error) {
     throw new Error(`Error hashing client secret: ${error.message}`);
   }

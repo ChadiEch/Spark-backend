@@ -216,8 +216,11 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     throw new APIError('Integration not found', 404);
   }
   
+  // Use the redirect URI from the request body, or fallback to the one from the integration config
+  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
+  
   // Exchange the code for tokens using the appropriate provider
-  const tokenData = await exchangeCodeForTokens(integration.key, code, redirectUri);
+  const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
   
   // Create or update the connection
   const connection = await createOrUpdateConnection(integration, req.user.id, tokenData);

@@ -85,9 +85,19 @@ const defaultIntegrations = [
 // Connect to MongoDB
 const connectDB = async () => {
   try {
+    console.log('Connecting to MongoDB...');
+    if (!process.env.MONGO_URI) {
+      console.error('MONGO_URI environment variable is not set');
+      process.exit(1);
+    }
+    
+    console.log(`MONGO_URI: ${process.env.MONGO_URI.substring(0, 30)}...`); // Log first 30 chars for debugging
+    
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000, // 10 second timeout
+      socketTimeoutMS: 10000,
     });
     
     console.log(`MongoDB Connected: ${conn.connection.host}`);
@@ -101,13 +111,16 @@ const connectDB = async () => {
 // Initialize integrations
 const initializeIntegrations = async () => {
   try {
+    console.log('Starting integration initialization...');
     // Connect to database
     await connectDB();
     
+    console.log('Removing existing integrations...');
     // Remove existing integrations
     await Integration.deleteMany({});
     console.log('Existing integrations removed');
     
+    console.log('Inserting default integrations...');
     // Insert the default integrations
     const integrations = await Integration.insertMany(defaultIntegrations);
     console.log(`Successfully initialized ${integrations.length} integrations:`);
@@ -116,13 +129,16 @@ const initializeIntegrations = async () => {
       console.log(`- ${integration.name} (${integration.key})`);
     });
     
+    console.log('Closing database connection...');
     // Close the connection
     mongoose.connection.close();
     console.log('Database connection closed');
     
+    console.log('Initialization complete!');
     process.exit(0);
   } catch (error) {
     console.error('Error initializing integrations:', error.message);
+    console.error('Stack trace:', error.stack);
     process.exit(1);
   }
 };

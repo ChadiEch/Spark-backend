@@ -4,6 +4,9 @@ const { protect, authorize } = require('../middleware/auth');
 const integrationController = require('../controllers/integrationController');
 const { getMetrics } = require('../utils/integrations/monitoring');
 
+// POST /api/integrations/initialize - Initialize integrations collection (public)
+router.post('/initialize', integrationController.initializeIntegrations);
+
 // All routes below are protected
 router.use(protect);
 
@@ -50,9 +53,6 @@ router.get('/metrics', authorize('admin'), (req, res) => {
     });
   }
 });
-
-// POST /api/integrations/initialize - Initialize integrations collection
-router.post('/initialize', integrationController.initializeIntegrations);
 
 // GET /api/integrations/metrics/health - Get integration health metrics
 router.get('/metrics/health', integrationController.getIntegrationMetrics);

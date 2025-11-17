@@ -201,7 +201,8 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     integrationId, 
     code: code ? 'present' : 'missing',
     redirectUri,
-    userId: req.user.id
+    userId: req.user.id,
+    body: req.body
   });
   
   if (!integrationId || !code) {
@@ -247,14 +248,36 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   
   try {
     // Exchange the code for tokens using the appropriate provider
-    const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
-    
-    logger.info('Token exchange successful', { 
+    logger.info('Attempting to exchange code for tokens', { 
       integrationKey: integration.key, 
       userId: req.user.id
     });
     
+    const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
+    
+    logger.info('Token exchange successful', { 
+      integrationKey: integration.key, 
+      userId: req.user.id,
+      tokenDataKeys: Object.keys(tokenData),
+      hasAccessToken: !!tokenData.access_token
+    });
+    
+    // Validate token data
+    if (!tokenData.access_token) {
+      logger.error('No access token in response', { 
+        integrationKey: integration.key, 
+        userId: req.user.id,
+        tokenDataKeys: Object.keys(tokenData)
+      });
+      throw new APIError('No access token received from OAuth provider', 500);
+    }
+    
     // Create or update the connection
+    logger.info('Creating or updating integration connection', { 
+      integrationKey: integration.key, 
+      userId: req.user.id
+    });
+    
     const connection = await createOrUpdateConnection(integration, req.user.id, tokenData);
     
     logger.info('Tokens exchanged successfully and connection saved to database', { 
@@ -263,9 +286,11 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
       connectionId: connection._id
     });
     
+    // Send success response with redirect URL
     res.status(200).json({
       success: true,
-      data: connection
+      data: connection,
+      redirectUrl: 'https://spark-frontend-production.up.railway.app/settings?tab=integrations'
     });
   } catch (error) {
     logger.error('Error during token exchange', { 
@@ -274,7 +299,13 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
       stack: error.stack,
       userId: req.user.id
     });
-    throw error;
+    
+    // Send error response
+    res.status(500).json({
+      success: false,
+      message: 'Failed to connect integration',
+      error: error.message
+    });
   }
 });
 

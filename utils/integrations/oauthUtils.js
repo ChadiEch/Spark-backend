@@ -29,7 +29,15 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       integrationKey, 
       code: code ? 'present' : 'missing',
       redirectUri,
-      clientId: integration.clientId ? 'present' : 'missing'
+      clientId: integration.clientId ? 'present' : 'missing',
+      clientSecret: integration.clientSecret ? 'present' : 'missing'
+    });
+    
+    // Log the exact request data we're sending
+    logger.info('OAuth token exchange request details', {
+      integrationKey,
+      redirectUri,
+      clientId: integration.clientId ? `${integration.clientId.substring(0, 5)}...` : 'missing'
     });
     
     switch (integrationKey) {
@@ -90,6 +98,18 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       hasRefreshToken: !!tokenResponse.data.refresh_token
     });
     
+    // Log the actual token data (without sensitive information)
+    if (tokenResponse.data) {
+      const safeData = { ...tokenResponse.data };
+      if (safeData.access_token) {
+        safeData.access_token = `${safeData.access_token.substring(0, 10)}...`;
+      }
+      if (safeData.refresh_token) {
+        safeData.refresh_token = `${safeData.refresh_token.substring(0, 10)}...`;
+      }
+      logger.info('Token exchange response data (sanitized)', safeData);
+    }
+    
     // Record successful API call
     recordAPICall(integrationKey, 'oauth/token', Date.now() - startTime, true);
     
@@ -102,8 +122,21 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       integrationKey, 
       error: error.message,
       response: error.response?.data,
-      status: error.response?.status
+      status: error.response?.status,
+      stack: error.stack
     });
+    
+    // If we got a response from the OAuth provider, include that in the error
+    if (error.response) {
+      logger.error('OAuth provider error details', {
+        integrationKey,
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+      throw new Error(`OAuth provider error (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+    }
+    
     throw error;
   }
 };
@@ -224,6 +257,14 @@ const createOrUpdateConnection = async (integration, userId, tokenData) => {
         expiresIn: tokenData.expires_in || null
       }
     };
+
+    logger.info('Connection data prepared', { 
+      integrationId: integration._id, 
+      userId,
+      hasAccessToken: !!connectionData.accessToken,
+      hasRefreshToken: !!connectionData.refreshToken,
+      expiresAt: expiresAt ? expiresAt.toISOString() : 'NEVER'
+    });
 
     // Check if connection already exists
     let connection = await IntegrationConnection.findOne({

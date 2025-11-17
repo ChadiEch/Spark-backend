@@ -255,12 +255,25 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     
     const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
     
-    logger.info('Token exchange successful', { 
+    logger.info('Token exchange response received', { 
       integrationKey: integration.key, 
       userId: req.user.id,
       tokenDataKeys: Object.keys(tokenData),
-      hasAccessToken: !!tokenData.access_token
+      hasAccessToken: !!tokenData.access_token,
+      hasRefreshToken: !!tokenData.refresh_token
     });
+    
+    // Log the actual token data (without sensitive information)
+    if (tokenData) {
+      const safeData = { ...tokenData };
+      if (safeData.access_token) {
+        safeData.access_token = `${safeData.access_token.substring(0, 10)}...`;
+      }
+      if (safeData.refresh_token) {
+        safeData.refresh_token = `${safeData.refresh_token.substring(0, 10)}...`;
+      }
+      logger.info('Token exchange response data (sanitized)', safeData);
+    }
     
     // Validate token data
     if (!tokenData.access_token) {

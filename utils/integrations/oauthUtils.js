@@ -150,6 +150,18 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       throw new Error(`Network error connecting to OAuth provider: ${error.message}`);
     }
     
+    // Handle axios errors specifically
+    if (error.isAxiosError) {
+      logger.error('Axios error during OAuth token exchange', {
+        integrationKey,
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw new Error(`OAuth provider error: ${error.message}`);
+    }
+    
     throw error;
   }
 };

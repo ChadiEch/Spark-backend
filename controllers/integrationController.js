@@ -337,7 +337,8 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     logger.error('Unhandled error in exchangeCodeForTokens', { 
       error: error.message,
       stack: error.stack,
-      userId: req.user?.id
+      userId: req.user?.id,
+      requestBody: req.body
     });
     
     // Send error response

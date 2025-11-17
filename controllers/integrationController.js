@@ -118,7 +118,7 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   switch (integration.key) {
     case 'facebook':
       // Facebook OAuth URL
-      authorizationUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
+      authorizationUrl = `https://www.facebook.com/v24.0/dialog/oauth?` +
         `client_id=${integration.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(','))}&` +

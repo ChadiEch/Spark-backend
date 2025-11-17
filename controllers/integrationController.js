@@ -187,165 +187,145 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
 
 // @desc    Exchange OAuth code for tokens
 // @route   POST /api/integrations/exchange
-// @access  Private
+// @access  Public (during OAuth callback flow)
 exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
+  // Check if database is connected
+  if (!mongoose.connection.readyState) {
+    logger.warn('Database not available for exchangeCodeForTokens request');
+    throw new APIError('Database not available', 503);
+  }
+  
+  const { integrationId, code, redirectUri } = req.body;
+  
+  // Validate required fields
+  if (!integrationId || !code) {
+    logger.warn('Missing required fields for token exchange', { integrationId: !!integrationId, code: !!code });
+    return res.status(400).json({
+      success: false,
+      message: 'Integration ID and authorization code are required'
+    });
+  }
+  
+  // Find the integration by either _id or key
+  let integration;
+  if (mongoose.Types.ObjectId.isValid(integrationId)) {
+    // If it's a valid ObjectId, search by _id
+    integration = await Integration.findById(integrationId);
+  } else {
+    // Otherwise, search by key
+    integration = await Integration.findOne({ key: integrationId });
+  }
+  
+  if (!integration) {
+    logger.warn('Integration not found for token exchange', { integrationId });
+    return res.status(404).json({
+      success: false,
+      message: 'Integration not found'
+    });
+  }
+  
+  logger.info('Found integration for token exchange', { 
+    integrationKey: integration.key, 
+    integrationName: integration.name
+  });
+  
+  // Use the redirect URI from the request body, or fallback to the one from the integration config
+  // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
+  const finalRedirectUri = redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
+  
+  logger.info('Using redirect URI for token exchange', { 
+    finalRedirectUri, 
+    providedRedirectUri: redirectUri,
+    integrationRedirectUri: integration.redirectUri
+  });
+  
   try {
-    // Check if database is connected
-    if (!mongoose.connection.readyState) {
-      logger.warn('Database not available for exchangeCodeForTokens request');
-      return res.status(503).json({
-        success: false,
-        message: 'Database not available'
-      });
-    }
-    
-    const { integrationId, code, redirectUri } = req.body;
-    
-    logger.info('Exchange code request received', { 
-      integrationId, 
-      code: code ? 'present' : 'missing',
-      redirectUri,
-      userId: req.user.id,
-      body: req.body
+    // Exchange the code for tokens using the appropriate provider
+    logger.info('Attempting to exchange code for tokens', { 
+      integrationKey: integration.key
     });
     
-    if (!integrationId || !code) {
-      logger.warn('Missing required parameters for token exchange', { 
-        integrationId: !!integrationId, 
-        code: !!code,
-        userId: req.user.id
-      });
-      return res.status(400).json({
-        success: false,
-        message: 'Integration ID and authorization code are required'
-      });
-    }
+    const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
     
-    // Find the integration by either _id or key
-    let integration;
-    if (mongoose.Types.ObjectId.isValid(integrationId)) {
-      // If it's a valid ObjectId, search by _id
-      integration = await Integration.findById(integrationId);
-    } else {
-      // Otherwise, search by key
-      integration = await Integration.findOne({ key: integrationId });
-    }
-    
-    if (!integration) {
-      logger.warn('Integration not found for token exchange', { integrationId, userId: req.user.id });
-      return res.status(404).json({
-        success: false,
-        message: 'Integration not found'
-      });
-    }
-    
-    logger.info('Found integration for token exchange', { 
-      integrationKey: integration.key, 
-      integrationName: integration.name,
-      userId: req.user.id
+    logger.info('Token exchange response received', { 
+      integrationKey: integration.key,
+      tokenDataKeys: Object.keys(tokenData),
+      hasAccessToken: !!tokenData.access_token,
+      hasRefreshToken: !!tokenData.refresh_token
     });
     
-    // Use the redirect URI from the request body, or fallback to the one from the integration config
-    // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
-    const finalRedirectUri = redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
-    
-    logger.info('Using redirect URI for token exchange', { 
-      finalRedirectUri, 
-      providedRedirectUri: redirectUri,
-      integrationRedirectUri: integration.redirectUri,
-      userId: req.user.id
-    });
-    
-    try {
-      // Exchange the code for tokens using the appropriate provider
-      logger.info('Attempting to exchange code for tokens', { 
-        integrationKey: integration.key, 
-        userId: req.user.id
-      });
-      
-      const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
-      
-      logger.info('Token exchange response received', { 
-        integrationKey: integration.key, 
-        userId: req.user.id,
-        tokenDataKeys: Object.keys(tokenData),
-        hasAccessToken: !!tokenData.access_token,
-        hasRefreshToken: !!tokenData.refresh_token
-      });
-      
-      // Log the actual token data (without sensitive information)
-      if (tokenData) {
-        const safeData = { ...tokenData };
-        if (safeData.access_token) {
-          safeData.access_token = `${safeData.access_token.substring(0, 10)}...`;
-        }
-        if (safeData.refresh_token) {
-          safeData.refresh_token = `${safeData.refresh_token.substring(0, 10)}...`;
-        }
-        logger.info('Token exchange response data (sanitized)', safeData);
+    // Log the actual token data (without sensitive information)
+    if (tokenData) {
+      const safeData = { ...tokenData };
+      if (safeData.access_token) {
+        safeData.access_token = `${safeData.access_token.substring(0, 10)}...`;
       }
-      
-      // Validate token data
-      if (!tokenData.access_token) {
-        logger.error('No access token in response', { 
-          integrationKey: integration.key, 
-          userId: req.user.id,
-          tokenDataKeys: Object.keys(tokenData)
-        });
-        return res.status(500).json({
-          success: false,
-          message: 'No access token received from OAuth provider'
-        });
+      if (safeData.refresh_token) {
+        safeData.refresh_token = `${safeData.refresh_token.substring(0, 10)}...`;
       }
-      
-      // Create or update the connection
-      logger.info('Creating or updating integration connection', { 
-        integrationKey: integration.key, 
-        userId: req.user.id
+      logger.info('Token exchange response data (sanitized)', safeData);
+    }
+    
+    // Validate token data
+    if (!tokenData.access_token) {
+      logger.error('No access token in response', { 
+        integrationKey: integration.key,
+        tokenDataKeys: Object.keys(tokenData)
       });
-      
-      const connection = await createOrUpdateConnection(integration, req.user.id, tokenData);
-      
-      logger.info('Tokens exchanged successfully and connection saved to database', { 
-        integrationId: integration._id, 
-        userId: req.user.id,
-        connectionId: connection._id
-      });
-      
-      // Send success response with redirect URL
-      return res.status(200).json({
-        success: true,
-        data: connection,
-        redirectUrl: 'https://spark-frontend-production.up.railway.app/settings?tab=integrations'
-      });
-    } catch (error) {
-      logger.error('Error during token exchange', { 
-        integrationKey: integration.key, 
-        error: error.message,
-        stack: error.stack,
-        userId: req.user.id
-      });
-      
-      // Send error response
       return res.status(500).json({
         success: false,
-        message: 'Failed to connect integration',
-        error: error.message
+        message: 'No access token received from OAuth provider'
       });
     }
-  } catch (error) {
-    logger.error('Unhandled error in exchangeCodeForTokens', { 
-      error: error.message,
-      stack: error.stack,
-      userId: req.user?.id,
-      requestBody: req.body
+    
+    // Extract userId from the request body (sent by frontend)
+    // In a real OAuth flow, the userId would be extracted from the state parameter
+    // but since this is a POST request, we expect it in the body
+    let userId = req.body.userId;
+    
+    // If we still don't have a userId, we can't proceed
+    if (!userId) {
+      logger.error('No userId found for token exchange', { integrationKey: integration.key });
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required to create integration connection'
+      });
+    }
+    
+    // Create or update the connection
+    logger.info('Creating or updating integration connection', { 
+      integrationKey: integration.key, 
+      userId: userId
     });
     
-    // Send error response
+    const connection = await createOrUpdateConnection(integration, userId, tokenData);
+    
+    logger.info('Tokens exchanged successfully and connection saved to database', { 
+      integrationId: integration._id, 
+      userId: userId,
+      connectionId: connection._id
+    });
+    
+    // Send success response with redirect URL
+    return res.status(200).json({
+      success: true,
+      data: connection,
+      redirectUrl: 'https://spark-frontend-production.up.railway.app/settings?tab=integrations'
+    });
+  } catch (error) {
+    logger.error('Error during token exchange', { 
+      integrationKey: integration.key, 
+      error: error.message,
+      stack: error.stack
+    });
+    
+    // Send error response with more details
     return res.status(500).json({
       success: false,
-      message: 'Internal server error',
-      error: error.message
+      message: 'Failed to connect integration',
+      error: error.message,
+      // Don't expose sensitive information in production
+      ...(process.env.NODE_ENV === 'development' && { errorDetails: error.message })
     });
   }
 });

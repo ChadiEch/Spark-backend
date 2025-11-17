@@ -7,6 +7,11 @@ const { getMetrics } = require('../utils/integrations/monitoring');
 // POST /api/integrations/initialize - Initialize integrations collection (public)
 router.post('/initialize', integrationController.initializeIntegrations);
 
+// POST /api/integrations/exchange - Exchange OAuth code for tokens (public)
+// This endpoint needs to be public because it's called during OAuth callback flow
+// before the user has a valid authentication token
+router.post('/exchange', integrationController.exchangeCodeForTokens);
+
 // All routes below are protected
 router.use(protect);
 
@@ -21,9 +26,6 @@ router.get('/connections', integrationController.getUserConnections);
 
 // POST /api/integrations/connect - Initiate connection to an integration
 router.post('/connect', integrationController.connectIntegration);
-
-// POST /api/integrations/exchange - Exchange OAuth code for tokens
-router.post('/exchange', integrationController.exchangeCodeForTokens);
 
 // DELETE /api/integrations/connections/:id - Disconnect from an integration
 router.delete('/connections/:id', integrationController.disconnectIntegration);

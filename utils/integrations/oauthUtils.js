@@ -134,7 +134,20 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
         statusText: error.response.statusText,
         data: error.response.data
       });
-      throw new Error(`OAuth provider error (${error.response.status}): ${JSON.stringify(error.response.data)}`);
+      
+      // Create a more detailed error message
+      const errorMessage = `OAuth provider error (${error.response.status}): ${JSON.stringify(error.response.data)}`;
+      throw new Error(errorMessage);
+    }
+    
+    // Handle network errors or other issues
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      logger.error('Network error during OAuth token exchange', { 
+        integrationKey, 
+        error: error.message,
+        code: error.code
+      });
+      throw new Error(`Network error connecting to OAuth provider: ${error.message}`);
     }
     
     throw error;

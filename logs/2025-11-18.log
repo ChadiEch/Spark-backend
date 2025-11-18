@@ -56,3 +56,15 @@
 {"timestamp":"2025-11-18T13:31:23.995Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":8484}
 {"timestamp":"2025-11-18T13:31:24.098Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":8484}
 {"timestamp":"2025-11-18T13:31:24.281Z","level":"INFO","message":"[server] Found 5 existing integrations, skipping initialization","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:52:59.290Z","level":"WARN","message":"[server] Dist directory not found, skipping static file serving","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.386Z","level":"INFO","message":"[scheduled-posting-service] Scheduled posting service started","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.390Z","level":"INFO","message":"[metrics-collection-service] Metrics collection service started","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.394Z","level":"INFO","message":"[integration-monitoring-service] Integration monitoring service started","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.402Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.401Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.402Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.403Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.402Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.403Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.433Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":21784}
+{"timestamp":"2025-11-18T13:52:59.523Z","level":"INFO","message":"[server] Found 5 existing integrations, skipping initialization","meta":{},"pid":21784}

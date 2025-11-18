@@ -9,3 +9,50 @@
 {"timestamp":"2025-11-18T06:30:00.144Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ae17eb61c76289313377b","status":"EXPIRED","integration":"Google Drive"},"pid":3344}
 {"timestamp":"2025-11-18T06:30:00.146Z","level":"INFO","message":"[integration-monitoring-service] Integration status check completed","meta":{},"pid":3344}
 {"timestamp":"2025-11-18T06:30:00.145Z","level":"INFO","message":"[integration-monitoring] API call recorded","meta":{"integrationKey":"integration-monitoring","endpoint":"check","responseTime":114,"success":true},"pid":3344}
+{"timestamp":"2025-11-18T13:23:50.193Z","level":"WARN","message":"[server] Dist directory not found, skipping static file serving","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.278Z","level":"INFO","message":"[scheduled-posting-service] Scheduled posting service started","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.281Z","level":"INFO","message":"[metrics-collection-service] Metrics collection service started","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.286Z","level":"INFO","message":"[integration-monitoring-service] Integration monitoring service started","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.301Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.303Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.304Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.304Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.301Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.300Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.380Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:23:50.570Z","level":"INFO","message":"[server] Found 5 existing integrations, skipping initialization","meta":{},"pid":2612}
+{"timestamp":"2025-11-18T13:26:10.869Z","level":"WARN","message":"[server] Dist directory not found, skipping static file serving","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.907Z","level":"INFO","message":"[metrics-collection-service] Metrics collection service started","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.902Z","level":"INFO","message":"[scheduled-posting-service] Scheduled posting service started","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.911Z","level":"INFO","message":"[integration-monitoring-service] Integration monitoring service started","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.917Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.917Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.918Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.919Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.920Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.916Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.955Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:26:10.993Z","level":"INFO","message":"[server] Found 5 existing integrations, skipping initialization","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.044Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.097Z","level":"INFO","message":"[integration-monitoring-service] Checking status for integration connections","meta":{"count":7},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.113Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691abc5a8eb26ea64fa4cc98","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.117Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ac6eac59e65115ad73266","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.120Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691acb4d292ffe2381dc1dba","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.124Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ad3581afff04488170d48","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.128Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ad71e1f59e25b0dbfb57c","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.131Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ae04a253387d8bdfad90a","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.134Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ae17eb61c76289313377b","status":"EXPIRED","user":"Unknown"},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.136Z","level":"INFO","message":"[integration-monitoring-service] Integration status check completed","meta":{},"pid":1216}
+{"timestamp":"2025-11-18T13:30:00.135Z","level":"INFO","message":"[integration-monitoring] API call recorded","meta":{"integrationKey":"integration-monitoring","endpoint":"check","responseTime":91,"success":true},"pid":1216}
+{"timestamp":"2025-11-18T13:31:23.807Z","level":"WARN","message":"[server] Dist directory not found, skipping static file serving","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.941Z","level":"INFO","message":"[scheduled-posting-service] Scheduled posting service started","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.958Z","level":"INFO","message":"[metrics-collection-service] Metrics collection service started","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.976Z","level":"INFO","message":"[integration-monitoring-service] Integration monitoring service started","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.997Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.996Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:24.000Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:24.008Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.999Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:23.995Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:24.098Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":8484}
+{"timestamp":"2025-11-18T13:31:24.281Z","level":"INFO","message":"[server] Found 5 existing integrations, skipping initialization","meta":{},"pid":8484}

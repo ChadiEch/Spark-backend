@@ -40,6 +40,11 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       clientId: integration.clientId ? `${integration.clientId.substring(0, 5)}...` : 'missing'
     });
     
+    // Validate that we have the required credentials
+    if (!integration.clientId || !integration.clientSecret) {
+      throw new Error(`Missing client credentials for integration: ${integrationKey}`);
+    }
+    
     switch (integrationKey) {
       case 'facebook':
       case 'instagram':
@@ -108,6 +113,11 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
         safeData.refresh_token = `${safeData.refresh_token.substring(0, 10)}...`;
       }
       logger.info('Token exchange response data (sanitized)', safeData);
+    }
+    
+    // Validate token data
+    if (!tokenResponse.data || !tokenResponse.data.access_token) {
+      throw new Error(`Invalid token response from ${integrationKey}: ${JSON.stringify(tokenResponse.data)}`);
     }
     
     // Record successful API call

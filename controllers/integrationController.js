@@ -195,7 +195,7 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     throw new APIError('Database not available', 503);
   }
   
-  const { integrationId, code, redirectUri } = req.body;
+  const { integrationId, code, redirectUri, state } = req.body;
   
   // Validate required fields
   if (!integrationId || !code) {
@@ -278,10 +278,22 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
       });
     }
     
-    // Extract userId from the request body (sent by frontend)
-    // In a real OAuth flow, the userId would be extracted from the state parameter
-    // but since this is a POST request, we expect it in the body
+    // Extract userId from the state parameter if provided
     let userId = req.body.userId;
+    
+    // If userId is not in the request body, try to extract it from the state parameter
+    if (!userId && state) {
+      try {
+        const stateData = JSON.parse(decodeURIComponent(state));
+        userId = stateData.userId;
+      } catch (parseError) {
+        logger.warn('Failed to parse state parameter', { 
+          integrationKey: integration.key,
+          state,
+          error: parseError.message
+        });
+      }
+    }
     
     // If we still don't have a userId, we can't proceed
     if (!userId) {

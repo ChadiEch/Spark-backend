@@ -16,7 +16,10 @@
     "cypress:run": "cypress run",
     "test:e2e": "cypress run",
     "init-integrations": "node scripts/initializeIntegrations.js",
-    "update-integrations": "node scripts/updateIntegrations.js"
+    "update-integrations": "node scripts/updateIntegrations.js",
+    "generate-encryption-key": "node scripts/generateEncryptionKey.js",
+    "validate-env": "node scripts/validateEnv.js",
+    "test-integrations": "node scripts/testIntegrations.js"
   },
   "dependencies": {
     "axios": "^1.13.2",

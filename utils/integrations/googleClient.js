@@ -141,11 +141,16 @@ class GoogleClient {
   async uploadDriveFile(fileData) {
     const startTime = Date.now();
     try {
+      // Validate required parameters
+      if (!fileData || !fileData.content) {
+        throw new Error('File data and content are required for Google Drive upload');
+      }
+      
       // For Google Drive upload, we need to use the proper multipart upload approach
       // First, create the file metadata
       const metadata = {
-        name: fileData.name,
-        mimeType: fileData.mimeType,
+        name: fileData.name || 'Unnamed File',
+        mimeType: fileData.mimeType || 'application/octet-stream',
         parents: fileData.parents || []
       };
 
@@ -185,8 +190,15 @@ class GoogleClient {
       
       logger.error('Error uploading file to Google Drive', { 
         error: error.message,
-        response: error.response?.data
+        response: error.response?.data,
+        status: error.response?.status
       });
+      
+      // If it's an auth error, provide a more specific message
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw new Error(`Google Drive authentication failed: ${error.response?.data?.error?.message || error.message}`);
+      }
+      
       throw error;
     }
   }

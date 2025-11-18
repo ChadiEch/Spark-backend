@@ -156,12 +156,13 @@ class IntegrationMonitoringService {
         connectionId: connection._id, 
         status: connection.status,
         integration: connection.integrationId?.name,
-        user: connection.userId?.email
+        user: connection.userId?.email || 'Unknown'
       });
     } catch (error) {
       logger.error('Error checking connection status', { 
         connectionId: connection._id, 
-        error: error.message 
+        error: error.message,
+        stack: error.stack
       });
       throw error;
     }
@@ -194,7 +195,8 @@ class IntegrationMonitoringService {
       connection.metadata = {
         ...connection.metadata,
         tokenType: tokenData.token_type || null,
-        expiresIn: tokenData.expires_in || null
+        expiresIn: tokenData.expires_in || null,
+        lastRefreshed: new Date()
       };
       
       // Save the updated connection
@@ -202,14 +204,17 @@ class IntegrationMonitoringService {
       
       logger.info('Token refreshed successfully for connection', { 
         connectionId: connection._id,
-        integration: connection.integrationId?.name
+        integration: connection.integrationId?.name,
+        expiresAt: connection.expiresAt?.toISOString() || 'Never'
       });
       
       return true;
     } catch (error) {
       logger.error('Error refreshing token', { 
         connectionId: connection._id, 
-        error: error.message 
+        integration: connection.integrationId?.name,
+        error: error.message,
+        stack: error.stack
       });
       
       // Re-throw the error with additional context

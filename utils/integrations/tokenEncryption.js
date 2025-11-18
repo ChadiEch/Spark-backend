@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 // In production, this should come from environment variables
 const ENCRYPTION_KEY = process.env.TOKEN_ENCRYPTION_KEY 
   ? Buffer.from(process.env.TOKEN_ENCRYPTION_KEY, 'base64') // If provided as base64
-  : crypto.createHash('sha256').update('this-is-a-very-long-key-for-encryption-32-bytes!').digest(); // Generate a proper 32-byte key
+  : crypto.randomBytes(32); // Generate a random 32-byte key for development
 
 const IV_LENGTH = 16; // For AES, this is always 16
 

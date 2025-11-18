@@ -12,7 +12,7 @@ const checkDBConnection = (req, res, next) => {
   // For debugging
   console.log('DB Connected status:', dbConnected);
   
-  if (!dbConnected) {
+  if (!dbConnected) { 
     logger.warn('Database not connected - rejecting request', {
       url: req.url,
       method: req.method

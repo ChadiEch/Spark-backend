@@ -1,0 +1,11 @@
+{"timestamp":"2025-11-18T06:30:00.049Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.127Z","level":"INFO","message":"[integration-monitoring-service] Checking status for integration connections","meta":{"count":7},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.133Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691abc5a8eb26ea64fa4cc98","status":"EXPIRED","integration":"Facebook"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.135Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ac6eac59e65115ad73266","status":"EXPIRED","integration":"Facebook"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.137Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691acb4d292ffe2381dc1dba","status":"EXPIRED","integration":"Google Drive"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.139Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ad3581afff04488170d48","status":"EXPIRED","integration":"Google Drive"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.140Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ad71e1f59e25b0dbfb57c","status":"EXPIRED","integration":"Google Drive"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.142Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ae04a253387d8bdfad90a","status":"EXPIRED","integration":"Google Drive"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.144Z","level":"INFO","message":"[integration-monitoring-service] Connection status updated","meta":{"connectionId":"691ae17eb61c76289313377b","status":"EXPIRED","integration":"Google Drive"},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.146Z","level":"INFO","message":"[integration-monitoring-service] Integration status check completed","meta":{},"pid":3344}
+{"timestamp":"2025-11-18T06:30:00.145Z","level":"INFO","message":"[integration-monitoring] API call recorded","meta":{"integrationKey":"integration-monitoring","endpoint":"check","responseTime":114,"success":true},"pid":3344}

@@ -233,7 +233,7 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   
   // Use the redirect URI from the request body, or fallback to the one from the integration config
   // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
-  const finalRedirectUri = redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
+  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
   
   logger.info('Using redirect URI for token exchange', { 
     finalRedirectUri, 

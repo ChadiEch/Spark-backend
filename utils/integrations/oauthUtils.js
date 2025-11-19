@@ -7,6 +7,60 @@ const { recordAPICall, recordError } = require('./monitoring');
 const logger = new Logger('oauth-utils');
 
 /**
+ * Map integration keys to their corresponding environment variable names.
+ * We prefer using environment variables because client secrets stored in Mongo
+ * are now hashed for security and therefore cannot be used directly in OAuth calls.
+ */
+const credentialEnvMap = {
+  facebook: {
+    clientId: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET
+  },
+  instagram: {
+    clientId: process.env.INSTAGRAM_CLIENT_ID,
+    clientSecret: process.env.INSTAGRAM_CLIENT_SECRET
+  },
+  tiktok: {
+    clientId: process.env.TIKTOK_CLIENT_KEY,
+    clientSecret: process.env.TIKTOK_CLIENT_SECRET
+  },
+  youtube: {
+    clientId: process.env.YOUTUBE_CLIENT_ID,
+    clientSecret: process.env.YOUTUBE_CLIENT_SECRET
+  },
+  'google-drive': {
+    clientId: process.env.GOOGLE_DRIVE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET
+  }
+};
+
+/**
+ * Resolve OAuth credentials for an integration, preferring environment variables
+ * and falling back to database values when available and not hashed.
+ */
+const getIntegrationCredentials = (integrationKey, integration) => {
+  const envCredentials = credentialEnvMap[integrationKey] || {};
+  
+  const resolvedClientId = envCredentials.clientId || integration?.clientId;
+  let resolvedClientSecret = envCredentials.clientSecret || integration?.clientSecret;
+
+  // Detect bcrypt hashes (start with $2) and treat them as unusable secrets.
+  if (!envCredentials.clientSecret && resolvedClientSecret && resolvedClientSecret.startsWith('$2')) {
+    logger.warn('Detected hashed client secret without environment override', { integrationKey });
+    resolvedClientSecret = null;
+  }
+
+  if (!resolvedClientId || !resolvedClientSecret) {
+    throw new Error(
+      `Missing OAuth credentials for integration "${integrationKey}". ` +
+      `Ensure the appropriate environment variables are configured.`
+    );
+  }
+
+  return { clientId: resolvedClientId, clientSecret: resolvedClientSecret };
+};
+
+/**
  * Exchange OAuth code for tokens for different providers
  * @param {string} integrationKey - The integration key (e.g., 'facebook', 'instagram')
  * @param {string} code - The authorization code received from OAuth flow
@@ -25,37 +79,34 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
 
     let tokenResponse;
     
+    const { clientId, clientSecret } = getIntegrationCredentials(integrationKey, integration);
+    
     logger.info('Exchanging code for tokens', { 
       integrationKey, 
       code: code ? 'present' : 'missing',
       redirectUri,
-      clientId: integration.clientId ? 'present' : 'missing',
-      clientSecret: integration.clientSecret ? 'present' : 'missing'
+      clientId: clientId ? 'present' : 'missing',
+      clientSecret: clientSecret ? 'present' : 'missing'
     });
     
     // Log the exact request data we're sending
     logger.info('OAuth token exchange request details', {
       integrationKey,
       redirectUri,
-      clientId: integration.clientId ? `${integration.clientId.substring(0, 5)}...` : 'missing'
+      clientId: clientId ? `${clientId.substring(0, 5)}...` : 'missing'
     });
-    
-    // Validate that we have the required credentials
-    if (!integration.clientId || !integration.clientSecret) {
-      throw new Error(`Missing client credentials for integration: ${integrationKey}`);
-    }
     
     switch (integrationKey) {
       case 'facebook':
       case 'instagram':
         // Facebook/Instagram token exchange
         logger.info('Exchanging code with Facebook/Instagram', { 
-          clientId: integration.clientId,
+          clientId,
           redirectUri
         });
         tokenResponse = await axios.post('https://graph.facebook.com/v18.0/oauth/access_token', {
-          client_id: integration.clientId,
-          client_secret: integration.clientSecret,
+          client_id: clientId,
+          client_secret: clientSecret,
           redirect_uri: redirectUri,
           code: code
         });
@@ -64,12 +115,12 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       case 'tiktok':
         // TikTok token exchange
         logger.info('Exchanging code with TikTok', { 
-          clientKey: integration.clientId,
+          clientKey: clientId,
           redirectUri
         });
         tokenResponse = await axios.post('https://open-api.tiktok.com/oauth/access_token/', {
-          client_key: integration.clientId,
-          client_secret: integration.clientSecret,
+          client_key: clientId,
+          client_secret: clientSecret,
           code: code,
           grant_type: 'authorization_code'
         });
@@ -79,12 +130,12 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
       case 'google-drive':
         // Google OAuth token exchange
         logger.info('Exchanging code with Google', { 
-          clientId: integration.clientId,
+          clientId,
           redirectUri
         });
         tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
-          client_id: integration.clientId,
-          client_secret: integration.clientSecret,
+          client_id: clientId,
+          client_secret: clientSecret,
           redirect_uri: redirectUri,
           grant_type: 'authorization_code',
           code: code
@@ -194,6 +245,8 @@ const refreshOAuthTokens = async (integrationKey, refreshToken) => {
 
     let tokenResponse;
     
+    const { clientId, clientSecret } = getIntegrationCredentials(integrationKey, integration);
+    
     switch (integrationKey) {
       case 'facebook':
       case 'instagram':
@@ -201,8 +254,8 @@ const refreshOAuthTokens = async (integrationKey, refreshToken) => {
         tokenResponse = await axios.get('https://graph.facebook.com/v18.0/oauth/access_token', {
           params: {
             grant_type: 'fb_exchange_token',
-            client_id: integration.clientId,
-            client_secret: integration.clientSecret,
+            client_id: clientId,
+            client_secret: clientSecret,
             fb_exchange_token: refreshToken
           }
         });
@@ -211,7 +264,7 @@ const refreshOAuthTokens = async (integrationKey, refreshToken) => {
       case 'tiktok':
         // TikTok token refresh
         tokenResponse = await axios.post('https://open-api.tiktok.com/oauth/refresh_token/', {
-          client_key: integration.clientId,
+          client_key: clientId,
           grant_type: 'refresh_token',
           refresh_token: refreshToken
         });
@@ -221,8 +274,8 @@ const refreshOAuthTokens = async (integrationKey, refreshToken) => {
       case 'google-drive':
         // Google OAuth token refresh
         tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
-          client_id: integration.clientId,
-          client_secret: integration.clientSecret,
+          client_id: clientId,
+          client_secret: clientSecret,
           grant_type: 'refresh_token',
           refresh_token: refreshToken
         });

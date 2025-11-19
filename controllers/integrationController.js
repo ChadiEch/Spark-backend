@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Integration = require('../models/Integration');
 const IntegrationConnection = require('../models/IntegrationConnection');
-const { exchangeCodeForTokens, refreshOAuthTokens, createOrUpdateConnection } = require('../utils/integrations/oauthUtils');
+const { exchangeCodeForTokens, refreshOAuthTokens, createOrUpdateConnection, getIntegrationCredentials } = require('../utils/integrations/oauthUtils');
 const { asyncHandler, APIError } = require('../middleware/errorHandler');
 const Logger = require('../utils/logger');
 const IntegrationMonitoringService = require('../utils/integrations/integrationMonitoringService');
@@ -118,8 +118,9 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   switch (integration.key) {
     case 'facebook':
       // Facebook OAuth URL
+      const facebookCredentials = getIntegrationCredentials('facebook', integration);
       authorizationUrl = `https://www.facebook.com/v24.0/dialog/oauth?` +
-        `client_id=${integration.clientId}&` +
+        `client_id=${facebookCredentials.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(','))}&` +
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
@@ -127,8 +128,9 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
       
     case 'instagram':
       // Instagram OAuth URL (through Facebook)
+      const instagramCredentials = getIntegrationCredentials('instagram', integration);
       authorizationUrl = `https://api.instagram.com/oauth/authorize?` +
-        `client_id=${integration.clientId}&` +
+        `client_id=${instagramCredentials.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(','))}&` +
         `response_type=code&` +
@@ -137,8 +139,9 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
       
     case 'tiktok':
       // TikTok OAuth URL
+      const tiktokCredentials = getIntegrationCredentials('tiktok', integration);
       authorizationUrl = `https://www.tiktok.com/auth/authorize?` +
-        `client_key=${integration.clientId}&` +
+        `client_key=${tiktokCredentials.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(','))}&` +
         `response_type=code&` +
@@ -147,8 +150,9 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
       
     case 'youtube':
       // YouTube OAuth URL (Google)
+      const youtubeCredentials = getIntegrationCredentials('youtube', integration);
       authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${integration.clientId}&` +
+        `client_id=${youtubeCredentials.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(' '))}&` +
         `response_type=code&` +
@@ -159,8 +163,9 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
       
     case 'google-drive':
       // Google Drive OAuth URL
+      const googleDriveCredentials = getIntegrationCredentials('google-drive', integration);
       authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${integration.clientId}&` +
+        `client_id=${googleDriveCredentials.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(' '))}&` +
         `response_type=code&` +

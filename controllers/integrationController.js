@@ -322,7 +322,7 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: connection,
-      redirectUrl: 'https://spark-frontend-production.up.railway.app/settings?tab=integrations'
+      redirectUrl: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/settings?tab=integrations` : 'http://localhost:5173/settings?tab=integrations'
     });
   } catch (error) {
     logger.error('Error during token exchange', { 
@@ -633,8 +633,8 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         key: 'instagram',
         icon: 'instagram',
         category: 'social',
-        clientId: 'instagram_client_id',
-        clientSecret: 'instagram_client_secret',
+        clientId: process.env.INSTAGRAM_CLIENT_ID || 'instagram_client_id',
+        clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'instagram_client_secret',
         redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
@@ -645,8 +645,8 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         key: 'facebook',
         icon: 'facebook',
         category: 'social',
-        clientId: '2302564490171864',
-        clientSecret: '46f1bebd6df4f4f8a3171e36e81c8981',
+        clientId: process.env.FACEBOOK_CLIENT_ID || 'facebook_client_id',
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'facebook_client_secret',
         redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
@@ -657,8 +657,8 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         key: 'tiktok',
         icon: 'tiktok',
         category: 'social',
-        clientId: 'tiktok_client_id',
-        clientSecret: 'tiktok_client_secret',
+        clientId: process.env.TIKTOK_CLIENT_KEY || 'tiktok_client_key',
+        clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'tiktok_client_secret',
         redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
@@ -669,8 +669,8 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         key: 'youtube',
         icon: 'youtube',
         category: 'social',
-        clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
-        clientSecret: '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',
+        clientId: process.env.YOUTUBE_CLIENT_ID || 'youtube_client_id',
+        clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'youtube_client_secret',
         redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/youtube',
@@ -684,8 +684,8 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         key: 'google-drive',
         icon: 'google-drive',
         category: 'storage',
-        clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
-        clientSecret: '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',
+        clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'google_drive_client_id',
+        clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'google_drive_client_secret',
         redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/drive'

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { checkDBConnection } = require('./dbConnection');
+const { refreshIntegrationTokens } = require('../utils/sessionManager');
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -37,6 +38,12 @@ exports.protect = async (req, res, next) => {
     }
     
     req.user = user;
+
+    // Refresh integration tokens in the background
+    refreshIntegrationTokens(user._id).catch(error => {
+      // Log error but don't block the request
+      console.error('Error refreshing integration tokens:', error.message);
+    });
 
     next();
   } catch (error) {

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 const { storeRefreshToken, getRefreshToken, removeRefreshToken, verifyRefreshToken } = require('../utils/refreshToken');
+const { refreshAuthToken } = require('../utils/sessionManager');
 const { asyncHandler, APIError } = require('../middleware/errorHandler');
 const Logger = require('../utils/logger');
 
@@ -197,29 +198,20 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    // Verify refresh token using JWT secret
-    const decoded = verifyRefreshToken(refreshToken, process.env.JWT_SECRET);
+    // Use session manager to refresh tokens
+    const refreshedTokens = await refreshAuthToken(refreshToken);
     
-    // Retrieve stored refresh token to ensure it hasn't been invalidated
-    const storedRefreshToken = getRefreshToken(decoded.id);
-    
-    // Validate that the provided token matches the stored token
-    if (refreshToken !== storedRefreshToken) {
-      logger.warn('Invalid refresh token provided', { userId: decoded.id });
-      throw new APIError('Invalid refresh token', 401);
-    }
+    // Store new refresh token
+    storeRefreshToken(refreshedTokens.user.id, refreshedTokens.refreshToken);
 
-    // Generate new access token with standard expiration
-    const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE
-    });
+    logger.info('Token refreshed successfully', { userId: refreshedTokens.user.id });
 
-    logger.info('Token refreshed successfully', { userId: decoded.id });
-
-    // Return new access token
+    // Return new tokens
     res.status(200).json({
       success: true,
-      token: newToken
+      token: refreshedTokens.accessToken,
+      refreshToken: refreshedTokens.refreshToken,
+      user: refreshedTokens.user
     });
   } catch (error) {
     // Handle token verification errors

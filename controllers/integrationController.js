@@ -153,6 +153,7 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
         `scope=${encodeURIComponent(integration.scopes.join(' '))}&` +
         `response_type=code&` +
         `access_type=offline&` +
+        `prompt=consent&` +
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
       break;
       
@@ -164,6 +165,7 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
         `scope=${encodeURIComponent(integration.scopes.join(' '))}&` +
         `response_type=code&` +
         `access_type=offline&` +
+        `prompt=consent&` +
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
       break;
       

@@ -191,9 +191,10 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
       
       // Log the specific redirect URI being used for YouTube
-      logger.info('YouTube OAuth redirect_uri', { 
+      logger.info('YouTube OAuth redirect_uri DETAILS', { 
         redirectUri: finalRedirectUri,
-        encodedRedirectUri: encodeURIComponent(finalRedirectUri)
+        encodedRedirectUri: encodeURIComponent(finalRedirectUri),
+        clientId: youtubeCredentials.clientId ? `${youtubeCredentials.clientId.substring(0, 30)}...` : 'MISSING'
       });
       break;
       
@@ -209,10 +210,11 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
         `prompt=consent&` +
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
       
-      // Log the specific redirect URI being used for Google Drive
-      logger.info('Google Drive OAuth redirect_uri', { 
+      // Log the specific redirect URI being used for Google Drive with more details
+      logger.info('Google Drive OAuth redirect_uri DETAILS', { 
         redirectUri: finalRedirectUri,
-        encodedRedirectUri: encodeURIComponent(finalRedirectUri)
+        encodedRedirectUri: encodeURIComponent(finalRedirectUri),
+        clientId: googleDriveCredentials.clientId ? `${googleDriveCredentials.clientId.substring(0, 30)}...` : 'MISSING'
       });
       break;
       
@@ -226,9 +228,10 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
   }
   
-  logger.info('Generated OAuth authorization URL', { 
+  logger.info('Generated OAuth authorization URL FULL', { 
     integrationKey: integration.key,
-    authorizationUrl: authorizationUrl.substring(0, 200) + '...' // Log more chars to see redirect_uri
+    redirectUri: finalRedirectUri,
+    authorizationUrl: authorizationUrl
   });
   
   res.status(200).json({
@@ -303,9 +306,10 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   
   // Log the specific redirect URI being used for Google integrations
   if (integration.key === 'google-drive' || integration.key === 'youtube') {
-    logger.info('Google integration token exchange redirect_uri', { 
+    logger.info('Google integration token exchange redirect_uri DETAILS', { 
       redirectUri: finalRedirectUri,
-      encodedRedirectUri: encodeURIComponent(finalRedirectUri)
+      encodedRedirectUri: encodeURIComponent(finalRedirectUri),
+      integrationKey: integration.key
     });
   }
   
@@ -514,9 +518,10 @@ exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
   
   // Log the specific redirect URI being used for Google integrations
   if (integration.key === 'google-drive' || integration.key === 'youtube') {
-    logger.info('Google integration OAuth callback redirect_uri', { 
+    logger.info('Google integration OAuth callback redirect_uri DETAILS', { 
       redirectUri: finalRedirectUri,
-      encodedRedirectUri: encodeURIComponent(finalRedirectUri)
+      encodedRedirectUri: encodeURIComponent(finalRedirectUri),
+      integrationKey: integration.key
     });
   }
   

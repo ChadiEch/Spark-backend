@@ -35,7 +35,7 @@ const fixRedirectUris = async () => {
       {}, 
       { 
         $set: { 
-          redirectUri: 'http://localhost:5173/integrations/callback' 
+          redirectUri: 'http://localhost:5001/api/integrations/callback' 
         } 
       }
     );

@@ -12,6 +12,10 @@ router.post('/initialize', integrationController.initializeIntegrations);
 // before the user has a valid authentication token
 router.post('/exchange', integrationController.exchangeCodeForTokens);
 
+// GET /api/integrations/callback - Handle OAuth callback directly (public)
+// This endpoint handles OAuth callbacks and exchanges codes for tokens
+router.get('/callback', integrationController.handleOAuthCallback);
+
 // All routes below are protected
 router.use(protect);
 

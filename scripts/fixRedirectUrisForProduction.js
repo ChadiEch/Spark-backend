@@ -35,7 +35,7 @@ const fixRedirectUrisForProduction = async () => {
       {}, 
       { 
         $set: { 
-          redirectUri: 'https://spark-frontend-production.up.railway.app/integrations/callback' 
+          redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback' 
         } 
       }
     );

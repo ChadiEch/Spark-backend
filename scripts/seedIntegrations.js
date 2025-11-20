@@ -20,7 +20,7 @@ const integrations = [
     category: 'social',
     clientId: 'instagram_client_id',
     clientSecret: 'instagram_client_secret',
-    redirectUri: 'http://localhost:5173/integrations/callback',
+    redirectUri: 'http://localhost:5001/api/integrations/callback',
     scopes: ['read', 'write'],
     enabled: true
   },
@@ -32,7 +32,7 @@ const integrations = [
     category: 'social',
     clientId: 'facebook_client_id',
     clientSecret: 'facebook_client_secret',
-    redirectUri: 'http://localhost:5173/integrations/callback',
+    redirectUri: 'http://localhost:5001/api/integrations/callback',
     scopes: ['read', 'write'],
     enabled: true
   },
@@ -44,7 +44,7 @@ const integrations = [
     category: 'social',
     clientId: 'tiktok_client_id',
     clientSecret: 'tiktok_client_secret',
-    redirectUri: 'http://localhost:5173/integrations/callback',
+    redirectUri: 'http://localhost:5001/api/integrations/callback',
     scopes: ['read', 'write'],
     enabled: true
   },
@@ -56,7 +56,7 @@ const integrations = [
     category: 'social',
     clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
     clientSecret: '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',
-    redirectUri: 'http://localhost:5173/integrations/callback',
+    redirectUri: 'http://localhost:5001/api/integrations/callback',
     scopes: [
       'https://www.googleapis.com/auth/youtube',
       'https://www.googleapis.com/auth/youtube.upload'
@@ -71,7 +71,7 @@ const integrations = [
     category: 'storage',
     clientId: '814259904377-39llm6tbn6okqlvucn6lrototb29t3f4.apps.googleusercontent.com',
     clientSecret: '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',
-    redirectUri: 'http://localhost:5173/integrations/callback',
+    redirectUri: 'http://localhost:5001/api/integrations/callback',
     scopes: [
       'https://www.googleapis.com/auth/drive'
     ],

@@ -17,6 +17,7 @@
     "test:e2e": "cypress run",
     "init-integrations": "node scripts/initializeIntegrations.js",
     "update-integrations": "node scripts/updateIntegrations.js",
+    "update-redirect-uris": "node scripts/updateRedirectUris.js",
     "generate-encryption-key": "node scripts/generateEncryptionKey.js",
     "validate-env": "node scripts/validateEnv.js",
     "test-integrations": "node scripts/testIntegrations.js",

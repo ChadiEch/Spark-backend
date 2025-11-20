@@ -1,6 +1,31 @@
 # Integration Setup Guide
 
-This guide explains how to set up and configure third-party integrations for the Winnerforce Spark platform.
+This guide will help you set up and configure integrations with third-party services.
+
+## OAuth Provider Configuration
+
+### 1. Facebook/Instagram
+1. Go to [Facebook Developer Portal](https://developers.facebook.com/)
+2. Create a new app
+3. Add the Facebook Login product
+4. Set the OAuth redirect URI to: `http://localhost:5001/api/integrations/callback`
+5. Copy the App ID and App Secret to your `.env` file
+
+### 2. TikTok
+1. Go to [TikTok Developer Portal](https://developers.tiktok.com/)
+2. Create a new app
+3. Set the OAuth redirect URI to: `http://localhost:5001/api/integrations/callback`
+4. Copy the Client Key and Client Secret to your `.env` file
+
+### 3. Google Drive/YouTube
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the YouTube Data API v3 and Google Drive API
+4. Create OAuth 2.0 credentials
+5. Set the OAuth redirect URIs to:
+   - `http://localhost:5001/api/integrations/callback`
+   - `https://spark-backend-production-ab14.up.railway.app/api/integrations/callback`
+6. Copy the Client ID and Client Secret to your `.env` file
 
 ## Environment Variables
 
@@ -45,13 +70,13 @@ For each integration, you'll need to create an application in the respective dev
 1. Go to [Facebook Developers](https://developers.facebook.com/)
 2. Create a new app
 3. Add the Facebook Login product
-4. Set the OAuth redirect URI to: `http://localhost:5173/integrations/callback`
+4. Set the OAuth redirect URI to: `http://localhost:5001/api/integrations/callback`
 5. Copy the App ID and App Secret to your `.env` file
 
 #### TikTok
 1. Go to [TikTok Developer Portal](https://developers.tiktok.com/)
 2. Create a new app
-3. Set the OAuth redirect URI to: `http://localhost:5173/integrations/callback`
+3. Set the OAuth redirect URI to: `http://localhost:5001/api/integrations/callback`
 4. Copy the Client Key and Client Secret to your `.env` file
 
 #### Google Drive/YouTube
@@ -60,9 +85,8 @@ For each integration, you'll need to create an application in the respective dev
 3. Enable the YouTube Data API v3 and Google Drive API
 4. Create OAuth 2.0 credentials
 5. Set the OAuth redirect URIs to:
-   - `http://localhost:5173/integrations/callback`
-   - `https://spark-frontend-production.up.railway.app/integrations/callback`
-   - `https://spark-frontend-production-ab14.up.railway.app/integrations/callback`
+   - `http://localhost:5001/api/integrations/callback`
+   - `https://spark-backend-production-ab14.up.railway.app/api/integrations/callback`
 6. Copy the Client ID and Client Secret to your `.env` file
 
 ### 3. Initialize Integrations

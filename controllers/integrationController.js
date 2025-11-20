@@ -110,7 +110,7 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   }
   
   // Use the redirect URI from the integration config, or fallback to request-based URI
-  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
+  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
   
   // Generate proper OAuth authorization URL based on integration type
   let authorizationUrl;
@@ -238,7 +238,7 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   
   // Use the redirect URI from the request body, or fallback to the one from the integration config
   // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
-  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/integrations/callback`;
+  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
   
   logger.info('Using redirect URI for token exchange', { 
     finalRedirectUri, 
@@ -346,6 +346,169 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
       // Don't expose sensitive information in production
       ...(process.env.NODE_ENV === 'development' && { errorDetails: error.message })
     });
+  }
+});
+
+// @desc    Handle OAuth callback directly
+// @route   GET /api/integrations/callback
+// @access  Public (during OAuth callback flow)
+exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
+  try {
+    // Extract OAuth parameters from query
+    const { code, state, error } = req.query;
+    
+    // Check for OAuth errors
+    if (error) {
+      logger.error('OAuth error received', { error });
+      return res.status(400).json({
+        success: false,
+        message: `OAuth error: ${error}`
+      });
+    }
+    
+    if (!code) {
+      logger.warn('No authorization code received in OAuth callback');
+      return res.status(400).json({
+        success: false,
+        message: 'No authorization code received'
+      });
+    }
+    
+    if (!state) {
+      logger.warn('No state parameter received in OAuth callback');
+      return res.status(400).json({
+        success: false,
+        message: 'No state parameter received'
+      });
+    }
+    
+    // Parse state to get integration info
+    let stateData;
+    try {
+      stateData = JSON.parse(decodeURIComponent(state));
+      logger.info('Parsed state data', stateData);
+    } catch (parseError) {
+      logger.error('Failed to parse state parameter', { state, error: parseError.message });
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid state parameter'
+      });
+    }
+    
+    const { integrationId, userId } = stateData;
+    
+    if (!integrationId) {
+      logger.warn('No integration ID in state');
+      return res.status(400).json({
+        success: false,
+        message: 'No integration ID in state'
+      });
+    }
+    
+    if (!userId) {
+      logger.warn('No user ID in state');
+      return res.status(400).json({
+        success: false,
+        message: 'No user ID in state'
+      });
+    }
+    
+    // Find the integration
+    let integration;
+    if (mongoose.Types.ObjectId.isValid(integrationId)) {
+      // If it's a valid ObjectId, search by _id
+      integration = await Integration.findById(integrationId);
+    } else {
+      // Otherwise, search by key
+      integration = await Integration.findOne({ key: integrationId });
+    }
+    
+    if (!integration) {
+      logger.warn('Integration not found for OAuth callback', { integrationId });
+      return res.status(404).json({
+        success: false,
+        message: 'Integration not found'
+      });
+    }
+    
+    // Use the redirect URI from the integration config
+    const finalRedirectUri = integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+    
+    logger.info('Using redirect URI for OAuth callback', { 
+      finalRedirectUri, 
+      integrationRedirectUri: integration.redirectUri
+    });
+    
+    try {
+      // Exchange the code for tokens using the appropriate provider
+      logger.info('Attempting to exchange code for tokens via OAuth callback', { 
+        integrationKey: integration.key
+      });
+      
+      const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
+      
+      logger.info('Token exchange response received via OAuth callback', { 
+        integrationKey: integration.key,
+        tokenDataKeys: Object.keys(tokenData),
+        hasAccessToken: !!tokenData.access_token,
+        hasRefreshToken: !!tokenData.refresh_token
+      });
+      
+      // Validate token data
+      if (!tokenData.access_token) {
+        logger.error('No access token in response via OAuth callback', { 
+          integrationKey: integration.key,
+          tokenDataKeys: Object.keys(tokenData)
+        });
+        return res.status(500).json({
+          success: false,
+          message: 'No access token received from OAuth provider'
+        });
+      }
+      
+      // Create or update the connection
+      const connection = await createOrUpdateConnection(integration, userId, tokenData);
+      
+      logger.info('Connection created/updated via OAuth callback', { 
+        connectionId: connection._id,
+        integrationId: connection.integrationId,
+        userId: connection.userId
+      });
+      
+      // Redirect to frontend with success
+      const frontendRedirectUrl = process.env.FRONTEND_URL 
+        ? `${process.env.FRONTEND_URL}/settings?tab=integrations&success=true`
+        : `http://localhost:5173/settings?tab=integrations&success=true`;
+      
+      logger.info('Redirecting to frontend after successful OAuth callback', { frontendRedirectUrl });
+      res.redirect(frontendRedirectUrl);
+    } catch (exchangeError) {
+      logger.error('Error exchanging code for tokens via OAuth callback', { 
+        integrationKey: integration.key,
+        error: exchangeError.message,
+        stack: exchangeError.stack
+      });
+      
+      // Redirect to frontend with error
+      const frontendRedirectUrl = process.env.FRONTEND_URL 
+        ? `${process.env.FRONTEND_URL}/settings?tab=integrations&error=${encodeURIComponent(exchangeError.message)}`
+        : `http://localhost:5173/settings?tab=integrations&error=${encodeURIComponent(exchangeError.message)}`;
+      
+      logger.info('Redirecting to frontend after failed OAuth callback', { frontendRedirectUrl });
+      res.redirect(frontendRedirectUrl);
+    }
+  } catch (error) {
+    logger.error('Error handling OAuth callback', { 
+      error: error.message,
+      stack: error.stack
+    });
+    
+    // Redirect to frontend with error
+    const frontendRedirectUrl = process.env.FRONTEND_URL 
+      ? `${process.env.FRONTEND_URL}/settings?tab=integrations&error=${encodeURIComponent('Internal server error')}`
+      : `http://localhost:5173/settings?tab=integrations&error=${encodeURIComponent('Internal server error')}`;
+    
+    res.redirect(frontendRedirectUrl);
   }
 });
 
@@ -642,7 +805,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.INSTAGRAM_CLIENT_ID || 'instagram_client_id',
         clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'instagram_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -654,7 +817,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.FACEBOOK_CLIENT_ID || 'facebook_client_id',
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'facebook_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -666,7 +829,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.TIKTOK_CLIENT_KEY || 'tiktok_client_key',
         clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'tiktok_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -678,7 +841,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.YOUTUBE_CLIENT_ID || 'youtube_client_id',
         clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'youtube_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/youtube',
           'https://www.googleapis.com/auth/youtube.upload'
@@ -693,7 +856,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'storage',
         clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'google_drive_client_id',
         clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'google_drive_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
+        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/drive'
         ],

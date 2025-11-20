@@ -37,35 +37,35 @@ const integrationUpdates = [
     key: 'instagram',
     clientId: process.env.INSTAGRAM_CLIENT_ID || 'YOUR_INSTAGRAM_CLIENT_ID',
     clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'YOUR_INSTAGRAM_CLIENT_SECRET',
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/integrations/callback',
+    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['pages_show_list', 'instagram_basic', 'instagram_content_publish', 'pages_manage_posts']
   },
   {
     key: 'facebook',
     clientId: process.env.FACEBOOK_CLIENT_ID || 'YOUR_FACEBOOK_CLIENT_ID',
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'YOUR_FACEBOOK_CLIENT_SECRET',
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/integrations/callback',
+    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['pages_show_list', 'pages_manage_posts', 'pages_read_engagement']
   },
   {
     key: 'tiktok',
     clientId: process.env.TIKTOK_CLIENT_KEY || 'YOUR_TIKTOK_CLIENT_KEY',
     clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'YOUR_TIKTOK_CLIENT_SECRET',
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/integrations/callback',
+    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['user.info.basic', 'video.list', 'video.upload']
   },
   {
     key: 'youtube',
     clientId: process.env.YOUTUBE_CLIENT_ID || 'YOUR_YOUTUBE_CLIENT_ID',
     clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'YOUR_YOUTUBE_CLIENT_SECRET',
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/integrations/callback',
+    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/auth/youtube']
   },
   {
     key: 'google-drive',
     clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'YOUR_GOOGLE_DRIVE_CLIENT_ID',
     clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'YOUR_GOOGLE_DRIVE_CLIENT_SECRET',
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/integrations/callback',
+    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['https://www.googleapis.com/auth/drive.file']
   }
 ];

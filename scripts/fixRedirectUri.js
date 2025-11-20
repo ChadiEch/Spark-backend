@@ -30,17 +30,17 @@ const fixRedirectUris = async () => {
   try {
     await connectDB();
     
-    // Update all integrations to use localhost redirect URI for development
+    // Update all integrations to use the default redirect URI
     const result = await Integration.updateMany(
       {}, 
       { 
         $set: { 
-          redirectUri: 'http://localhost:5001/api/integrations/callback' 
+          redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback' 
         } 
       }
     );
     
-    console.log(`Updated ${result.modifiedCount} integrations with localhost redirect URI`);
+    console.log(`Updated ${result.modifiedCount} integrations with default redirect URI`);
     
     // List all integrations to verify
     const integrations = await Integration.find({}, 'name key redirectUri');

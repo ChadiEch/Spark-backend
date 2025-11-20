@@ -23,7 +23,7 @@ const defaultIntegrations = [
     category: 'social',
     clientId: process.env.INSTAGRAM_CLIENT_ID,
     clientSecret: process.env.INSTAGRAM_CLIENT_SECRET,
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+    redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['read', 'write'],
     enabled: true
   },
@@ -35,7 +35,7 @@ const defaultIntegrations = [
     category: 'social',
     clientId: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+    redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['read', 'write'],
     enabled: true
   },
@@ -47,7 +47,7 @@ const defaultIntegrations = [
     category: 'social',
     clientId: process.env.TIKTOK_CLIENT_KEY,
     clientSecret: process.env.TIKTOK_CLIENT_SECRET,
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+    redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: ['read', 'write'],
     enabled: true
   },
@@ -59,7 +59,7 @@ const defaultIntegrations = [
     category: 'social',
     clientId: process.env.YOUTUBE_CLIENT_ID,
     clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+    redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: [
       'https://www.googleapis.com/auth/youtube',
       'https://www.googleapis.com/auth/youtube.upload'
@@ -74,7 +74,7 @@ const defaultIntegrations = [
     category: 'storage',
     clientId: process.env.GOOGLE_DRIVE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET,
-    redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+    redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
     scopes: [
       'https://www.googleapis.com/auth/drive'
     ],

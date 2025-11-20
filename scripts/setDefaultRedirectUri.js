@@ -28,8 +28,8 @@ const connectDB = async () => {
   }
 };
 
-// Update redirect URIs for all integrations
-const updateRedirectUris = async () => {
+// Set default redirect URI for all integrations
+const setDefaultRedirectUri = async () => {
   try {
     await connectDB();
     
@@ -58,13 +58,13 @@ const updateRedirectUris = async () => {
       console.log(`  Matches default: ${integration.redirectUri === defaultRedirectUri}`);
     });
     
-    console.log('\nRedirect URI update completed successfully');
+    console.log('\nDefault redirect URI update completed successfully');
     process.exit(0);
   } catch (error) {
-    console.error('Error updating redirect URIs:', error);
+    console.error('Error updating default redirect URIs:', error);
     process.exit(1);
   }
 };
 
 // Run the update function
-updateRedirectUris();
+setDefaultRedirectUri();

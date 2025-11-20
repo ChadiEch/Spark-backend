@@ -110,7 +110,9 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   }
   
   // Use the redirect URI from the integration config, or fallback to request-based URI
-  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+  // Always default to the production backend callback URL if nothing is provided
+  const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
+  const finalRedirectUri = redirectUri || integration.redirectUri || defaultRedirectUri;
   
   // Generate proper OAuth authorization URL based on integration type
   let authorizationUrl;
@@ -238,7 +240,9 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   
   // Use the redirect URI from the request body, or fallback to the one from the integration config
   // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
-  const finalRedirectUri = redirectUri || integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+  // Always default to the production backend callback URL if nothing is provided
+  const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
+  const finalRedirectUri = redirectUri || integration.redirectUri || defaultRedirectUri;
   
   logger.info('Using redirect URI for token exchange', { 
     finalRedirectUri, 
@@ -432,7 +436,9 @@ exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
     }
     
     // Use the redirect URI from the integration config
-    const finalRedirectUri = integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+    // Always default to the production backend callback URL if nothing is provided
+    const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
+    const finalRedirectUri = integration.redirectUri || defaultRedirectUri;
     
     logger.info('Using redirect URI for OAuth callback', { 
       finalRedirectUri, 
@@ -805,7 +811,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.INSTAGRAM_CLIENT_ID || 'instagram_client_id',
         clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'instagram_client_secret',
-        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+        redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -817,7 +823,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.FACEBOOK_CLIENT_ID || 'facebook_client_id',
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'facebook_client_secret',
-        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+        redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -829,7 +835,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.TIKTOK_CLIENT_KEY || 'tiktok_client_key',
         clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'tiktok_client_secret',
-        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+        redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
         scopes: ['read', 'write'],
         enabled: true
       },
@@ -841,7 +847,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'social',
         clientId: process.env.YOUTUBE_CLIENT_ID || 'youtube_client_id',
         clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'youtube_client_secret',
-        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+        redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/youtube',
           'https://www.googleapis.com/auth/youtube.upload'
@@ -856,7 +862,7 @@ exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
         category: 'storage',
         clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'google_drive_client_id',
         clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'google_drive_client_secret',
-        redirectUri: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/integrations/callback` : 'http://localhost:5001/api/integrations/callback',
+        redirectUri: 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback',
         scopes: [
           'https://www.googleapis.com/auth/drive'
         ],

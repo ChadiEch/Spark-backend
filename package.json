@@ -22,6 +22,7 @@
     "check-redirect-uris": "node scripts/checkRedirectUris.js",
     "update-client-credentials": "node scripts/updateClientCredentials.js",
     "debug-oauth": "node scripts/debugOAuthFlow.js",
+    "debug-google-oauth": "node scripts/debugGoogleOAuth.js",
     "generate-encryption-key": "node scripts/generateEncryptionKey.js",
     "validate-env": "node scripts/validateEnv.js",
     "test-integrations": "node scripts/testIntegrations.js",

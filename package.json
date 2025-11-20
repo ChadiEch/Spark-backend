@@ -19,6 +19,7 @@
     "update-integrations": "node scripts/updateIntegrations.js",
     "update-redirect-uris": "node scripts/updateRedirectUris.js",
     "set-default-redirect-uri": "node scripts/setDefaultRedirectUri.js",
+    "check-redirect-uris": "node scripts/checkRedirectUris.js",
     "generate-encryption-key": "node scripts/generateEncryptionKey.js",
     "validate-env": "node scripts/validateEnv.js",
     "test-integrations": "node scripts/testIntegrations.js",

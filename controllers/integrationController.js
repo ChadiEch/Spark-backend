@@ -78,7 +78,7 @@ exports.getUserConnections = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Initiate connection to an integration
+// @desc    Initiate OAuth connection for an integration
 // @route   POST /api/integrations/connect
 // @access  Private
 exports.connectIntegration = asyncHandler(async (req, res, next) => {
@@ -90,8 +90,13 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   
   const { integrationId, redirectUri } = req.body;
   
+  // Validate required fields
   if (!integrationId) {
-    throw new APIError('Integration ID is required', 400);
+    logger.warn('Missing integrationId for connection request');
+    return res.status(400).json({
+      success: false,
+      message: 'Integration ID is required'
+    });
   }
   
   // Find the integration by either _id or key
@@ -105,15 +110,38 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   }
   
   if (!integration) {
-    logger.warn('Integration not found for connection', { integrationId });
-    throw new APIError('Integration not found', 404);
+    logger.warn('Integration not found for connection request', { integrationId });
+    return res.status(404).json({
+      success: false,
+      message: 'Integration not found'
+    });
   }
   
-  // Use the redirect URI from the integration config, or fallback to request-based URI
+  logger.info('Found integration for connection', { 
+    integrationKey: integration.key, 
+    integrationName: integration.name,
+    integrationRedirectUri: integration.redirectUri
+  });
+  
+  // Use the redirect URI from the request body, or fallback to the one from the integration config
+  // Prioritize the redirect URI from the frontend request to match OAuth provider configuration
   // Always default to the production backend callback URL if nothing is provided
   const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
   const finalRedirectUri = redirectUri || integration.redirectUri || defaultRedirectUri;
   
+  logger.info('Using redirect URI for OAuth authorization', { 
+    finalRedirectUri, 
+    providedRedirectUri: redirectUri,
+    integrationRedirectUri: integration.redirectUri,
+    defaultRedirectUri
+  });
+  
+  // Log the client ID being used
+  logger.info('Using client ID for OAuth authorization', { 
+    clientId: integration.clientId ? `${integration.clientId.substring(0, 30)}...` : 'MISSING',
+    integrationKey: integration.key
+  });
+
   // Generate proper OAuth authorization URL based on integration type
   let authorizationUrl;
   
@@ -186,7 +214,10 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
         `state=${encodeURIComponent(JSON.stringify({ integrationId: integration._id, userId: req.user.id }))}`;
   }
   
-  logger.info('Integration connection initiated', { integrationId: integration._id, userId: req.user.id });
+  logger.info('Generated OAuth authorization URL', { 
+    integrationKey: integration.key,
+    authorizationUrl: authorizationUrl.substring(0, 100) + '...' // Log only first 100 chars for security
+  });
   
   res.status(200).json({
     success: true,
@@ -205,6 +236,14 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
   }
   
   const { integrationId, code, redirectUri, state } = req.body;
+  
+  // Log the incoming request
+  logger.info('Received OAuth code exchange request', { 
+    integrationId: !!integrationId, 
+    code: !!code,
+    redirectUri: redirectUri ? `${redirectUri.substring(0, 50)}...` : 'MISSING',
+    state: state ? `${state.substring(0, 50)}...` : 'MISSING'
+  });
   
   // Validate required fields
   if (!integrationId || !code) {
@@ -297,6 +336,7 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
       try {
         const stateData = JSON.parse(decodeURIComponent(state));
         userId = stateData.userId;
+        logger.info('Extracted userId from state parameter', { userId });
       } catch (parseError) {
         logger.warn('Failed to parse state parameter', { 
           integrationKey: integration.key,
@@ -308,10 +348,10 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
     
     // If we still don't have a userId, we can't proceed
     if (!userId) {
-      logger.error('No userId found for token exchange', { integrationKey: integration.key });
+      logger.warn('No userId provided for token exchange', { integrationKey: integration.key });
       return res.status(400).json({
         success: false,
-        message: 'User ID is required to create integration connection'
+        message: 'User ID is required'
       });
     }
     
@@ -357,163 +397,157 @@ exports.exchangeCodeForTokens = asyncHandler(async (req, res, next) => {
 // @route   GET /api/integrations/callback
 // @access  Public (during OAuth callback flow)
 exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
+  // Check if database is connected
+  if (!mongoose.connection.readyState) {
+    logger.warn('Database not available for handleOAuthCallback request');
+    throw new APIError('Database not available', 503);
+  }
+  
+  const { code, state, error } = req.query;
+  
+  // Log the incoming callback
+  logger.info('Received OAuth callback', { 
+    code: !!code,
+    state: state ? `${state.substring(0, 50)}...` : 'MISSING',
+    error: error || 'NONE'
+  });
+  
+  // Check for OAuth errors
+  if (error) {
+    logger.warn('OAuth provider returned an error', { error });
+    return res.status(400).json({
+      success: false,
+      message: `OAuth error: ${error}`
+    });
+  }
+  
+  // Validate required fields
+  if (!code || !state) {
+    logger.warn('Missing required fields in OAuth callback', { code: !!code, state: !!state });
+    return res.status(400).json({
+      success: false,
+      message: 'Authorization code and state are required'
+    });
+  }
+  
+  // Parse state to get integration ID and user ID
+  let stateData;
   try {
-    // Extract OAuth parameters from query
-    const { code, state, error } = req.query;
-    
-    // Check for OAuth errors
-    if (error) {
-      logger.error('OAuth error received', { error });
-      return res.status(400).json({
-        success: false,
-        message: `OAuth error: ${error}`
-      });
-    }
-    
-    if (!code) {
-      logger.warn('No authorization code received in OAuth callback');
-      return res.status(400).json({
-        success: false,
-        message: 'No authorization code received'
-      });
-    }
-    
-    if (!state) {
-      logger.warn('No state parameter received in OAuth callback');
-      return res.status(400).json({
-        success: false,
-        message: 'No state parameter received'
-      });
-    }
-    
-    // Parse state to get integration info
-    let stateData;
-    try {
-      stateData = JSON.parse(decodeURIComponent(state));
-      logger.info('Parsed state data', stateData);
-    } catch (parseError) {
-      logger.error('Failed to parse state parameter', { state, error: parseError.message });
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid state parameter'
-      });
-    }
-    
-    const { integrationId, userId } = stateData;
-    
-    if (!integrationId) {
-      logger.warn('No integration ID in state');
-      return res.status(400).json({
-        success: false,
-        message: 'No integration ID in state'
-      });
-    }
-    
-    if (!userId) {
-      logger.warn('No user ID in state');
-      return res.status(400).json({
-        success: false,
-        message: 'No user ID in state'
-      });
-    }
-    
-    // Find the integration
-    let integration;
-    if (mongoose.Types.ObjectId.isValid(integrationId)) {
-      // If it's a valid ObjectId, search by _id
-      integration = await Integration.findById(integrationId);
-    } else {
-      // Otherwise, search by key
-      integration = await Integration.findOne({ key: integrationId });
-    }
-    
-    if (!integration) {
-      logger.warn('Integration not found for OAuth callback', { integrationId });
-      return res.status(404).json({
-        success: false,
-        message: 'Integration not found'
-      });
-    }
-    
-    // Use the redirect URI from the integration config
-    // Always default to the production backend callback URL if nothing is provided
-    const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
-    const finalRedirectUri = integration.redirectUri || defaultRedirectUri;
-    
-    logger.info('Using redirect URI for OAuth callback', { 
-      finalRedirectUri, 
-      integrationRedirectUri: integration.redirectUri
+    stateData = JSON.parse(decodeURIComponent(state));
+    logger.info('Parsed state data', { 
+      integrationId: stateData.integrationId,
+      userId: stateData.userId
+    });
+  } catch (parseError) {
+    logger.error('Failed to parse state parameter', { 
+      state,
+      error: parseError.message
+    });
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid state parameter'
+    });
+  }
+  
+  const { integrationId, userId } = stateData;
+  
+  if (!integrationId || !userId) {
+    logger.warn('Missing integrationId or userId in state', { integrationId: !!integrationId, userId: !!userId });
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid state parameter: missing integrationId or userId'
+    });
+  }
+  
+  // Find the integration
+  let integration;
+  if (mongoose.Types.ObjectId.isValid(integrationId)) {
+    // If it's a valid ObjectId, search by _id
+    integration = await Integration.findById(integrationId);
+  } else {
+    // Otherwise, search by key
+    integration = await Integration.findOne({ key: integrationId });
+  }
+  
+  if (!integration) {
+    logger.warn('Integration not found for OAuth callback', { integrationId });
+    return res.status(404).json({
+      success: false,
+      message: 'Integration not found'
+    });
+  }
+  
+  logger.info('Found integration for OAuth callback', { 
+    integrationKey: integration.key, 
+    integrationName: integration.name
+  });
+  
+  // Use the redirect URI from the integration config
+  // Always default to the production backend callback URL if nothing is provided
+  const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
+  const finalRedirectUri = integration.redirectUri || defaultRedirectUri;
+  
+  logger.info('Using redirect URI for OAuth callback processing', { 
+    finalRedirectUri, 
+    integrationRedirectUri: integration.redirectUri
+  });
+  
+  try {
+    // Exchange the code for tokens using the appropriate provider
+    logger.info('Attempting to exchange code for tokens via OAuth callback', { 
+      integrationKey: integration.key
     });
     
-    try {
-      // Exchange the code for tokens using the appropriate provider
-      logger.info('Attempting to exchange code for tokens via OAuth callback', { 
-        integrationKey: integration.key
-      });
-      
-      const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
-      
-      logger.info('Token exchange response received via OAuth callback', { 
+    const tokenData = await exchangeCodeForTokens(integration.key, code, finalRedirectUri);
+    
+    logger.info('Token exchange response received via OAuth callback', { 
+      integrationKey: integration.key,
+      tokenDataKeys: Object.keys(tokenData),
+      hasAccessToken: !!tokenData.access_token,
+      hasRefreshToken: !!tokenData.refresh_token
+    });
+    
+    // Validate token data
+    if (!tokenData.access_token) {
+      logger.error('No access token in response via OAuth callback', { 
         integrationKey: integration.key,
-        tokenDataKeys: Object.keys(tokenData),
-        hasAccessToken: !!tokenData.access_token,
-        hasRefreshToken: !!tokenData.refresh_token
+        tokenDataKeys: Object.keys(tokenData)
       });
-      
-      // Validate token data
-      if (!tokenData.access_token) {
-        logger.error('No access token in response via OAuth callback', { 
-          integrationKey: integration.key,
-          tokenDataKeys: Object.keys(tokenData)
-        });
-        return res.status(500).json({
-          success: false,
-          message: 'No access token received from OAuth provider'
-        });
-      }
-      
-      // Create or update the connection
-      const connection = await createOrUpdateConnection(integration, userId, tokenData);
-      
-      logger.info('Connection created/updated via OAuth callback', { 
-        connectionId: connection._id,
-        integrationId: connection.integrationId,
-        userId: connection.userId
+      return res.status(500).json({
+        success: false,
+        message: 'No access token received from OAuth provider'
       });
-      
-      // Redirect to frontend with success
-      const frontendRedirectUrl = process.env.FRONTEND_URL 
-        ? `${process.env.FRONTEND_URL}/settings?tab=integrations&success=true`
-        : `http://localhost:5173/settings?tab=integrations&success=true`;
-      
-      logger.info('Redirecting to frontend after successful OAuth callback', { frontendRedirectUrl });
-      res.redirect(frontendRedirectUrl);
-    } catch (exchangeError) {
-      logger.error('Error exchanging code for tokens via OAuth callback', { 
-        integrationKey: integration.key,
-        error: exchangeError.message,
-        stack: exchangeError.stack
-      });
-      
-      // Redirect to frontend with error
-      const frontendRedirectUrl = process.env.FRONTEND_URL 
-        ? `${process.env.FRONTEND_URL}/settings?tab=integrations&error=${encodeURIComponent(exchangeError.message)}`
-        : `http://localhost:5173/settings?tab=integrations&error=${encodeURIComponent(exchangeError.message)}`;
-      
-      logger.info('Redirecting to frontend after failed OAuth callback', { frontendRedirectUrl });
-      res.redirect(frontendRedirectUrl);
     }
-  } catch (error) {
-    logger.error('Error handling OAuth callback', { 
-      error: error.message,
-      stack: error.stack
+    
+    // Create or update the connection
+    const connection = await createOrUpdateConnection(integration, userId, tokenData);
+    
+    logger.info('Connection created/updated via OAuth callback', { 
+      connectionId: connection._id,
+      integrationId: connection.integrationId,
+      userId: connection.userId
+    });
+    
+    // Redirect to frontend with success
+    const frontendRedirectUrl = process.env.FRONTEND_URL 
+      ? `${process.env.FRONTEND_URL}/settings?tab=integrations&success=true`
+      : `http://localhost:5173/settings?tab=integrations&success=true`;
+    
+    logger.info('Redirecting to frontend after successful OAuth callback', { frontendRedirectUrl });
+    res.redirect(frontendRedirectUrl);
+  } catch (exchangeError) {
+    logger.error('Error exchanging code for tokens via OAuth callback', { 
+      integrationKey: integration.key,
+      error: exchangeError.message,
+      stack: exchangeError.stack
     });
     
     // Redirect to frontend with error
     const frontendRedirectUrl = process.env.FRONTEND_URL 
-      ? `${process.env.FRONTEND_URL}/settings?tab=integrations&error=${encodeURIComponent('Internal server error')}`
-      : `http://localhost:5173/settings?tab=integrations&error=${encodeURIComponent('Internal server error')}`;
+      ? `${process.env.FRONTEND_URL}/settings?tab=integrations&error=${encodeURIComponent(exchangeError.message)}`
+      : `http://localhost:5173/settings?tab=integrations&error=${encodeURIComponent(exchangeError.message)}`;
     
+    logger.info('Redirecting to frontend after failed OAuth callback', { frontendRedirectUrl });
     res.redirect(frontendRedirectUrl);
   }
 });

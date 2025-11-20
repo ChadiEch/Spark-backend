@@ -407,5 +407,6 @@ const createOrUpdateConnection = async (integration, userId, tokenData) => {
 module.exports = {
   exchangeCodeForTokens,
   refreshOAuthTokens,
-  createOrUpdateConnection
+  createOrUpdateConnection,
+  getIntegrationCredentials
 };

@@ -1,0 +1,25 @@
+{"timestamp":"2025-11-21T06:16:34.917Z","level":"INFO","message":"[scheduled-posting-service] Scheduled posting service started","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.920Z","level":"INFO","message":"[metrics-collection-service] Metrics collection service started","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.927Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.928Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.922Z","level":"INFO","message":"[integration-monitoring-service] Integration monitoring service started","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.928Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.929Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.929Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.929Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:34.957Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:16:35.139Z","level":"INFO","message":"[server] Found 5 existing integrations, skipping initialization","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:30:00.092Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T06:30:00.110Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T07:00:00.059Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T07:00:00.098Z","level":"INFO","message":"[metrics-collection-service] Starting metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T07:00:00.109Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T07:00:00.113Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T07:30:00.030Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T07:30:00.048Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T08:00:00.043Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T08:00:00.056Z","level":"INFO","message":"[metrics-collection-service] Starting metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T08:00:00.063Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T08:00:00.065Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T08:30:00.036Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T08:30:00.042Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}

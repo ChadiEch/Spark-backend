@@ -1,0 +1,23 @@
+// Simple test to verify redirect URI configuration
+console.log('=== REDIRECT URI VERIFICATION ===');
+console.log('Make sure this exact URI is registered in your Google OAuth Console:');
+console.log('');
+console.log('https://spark-backend-production-ab14.up.railway.app/api/integrations/callback');
+console.log('');
+console.log('Steps to verify:');
+console.log('1. Go to https://console.cloud.google.com/');
+console.log('2. Select your project');
+console.log('3. Go to "APIs & Services" > "Credentials"');
+console.log('4. Click on your OAuth 2.0 Client ID');
+console.log('5. Check the "Authorized redirect URIs" section');
+console.log('6. Make sure the URI above is listed exactly as shown');
+console.log('');
+console.log('Common issues:');
+console.log('- Missing "https://"');
+console.log('- Extra or missing trailing slash');
+console.log('- Wrong domain name');
+console.log('- Extra spaces or characters');
+console.log('');
+console.log('If you\'re still having issues, try adding these URIs too:');
+console.log('- http://localhost:5001/api/integrations/callback (for local development)');
+console.log('- https://spark-frontend-production.up.railway.app/integrations/callback (if needed)');

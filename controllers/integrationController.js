@@ -129,6 +129,18 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
   const finalRedirectUri = redirectUri || integration.redirectUri || defaultRedirectUri;
   
+  // === DETAILED OAUTH DEBUGGING ===
+  logger.info("=== DETAILED OAUTH DEBUGGING ===");
+  logger.info("Integration details:", {
+    integrationId: integration._id,
+    integrationKey: integration.key,
+    integrationName: integration.name,
+    dbRedirectUri: integration.redirectUri,
+    providedRedirectUri: redirectUri,
+    defaultRedirectUri: defaultRedirectUri,
+    finalRedirectUri: finalRedirectUri
+  });
+  
   logger.info('Using redirect URI for OAuth authorization', { 
     finalRedirectUri, 
     providedRedirectUri: redirectUri,
@@ -201,6 +213,16 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
     case 'google-drive':
       // Google Drive OAuth URL
       const googleDriveCredentials = getIntegrationCredentials('google-drive', integration);
+      
+      // === DETAILED AUTHORIZATION URL DEBUGGING ===
+      logger.info("Authorization URL components:", {
+        clientId: googleDriveCredentials.clientId.substring(0, 10) + "...",
+        redirectUri: finalRedirectUri,
+        encodedRedirectUri: encodeURIComponent(finalRedirectUri),
+        scopes: integration.scopes,
+        state: JSON.stringify({ integrationId: integration._id, userId: req.user.id })
+      });
+      
       authorizationUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${googleDriveCredentials.clientId}&` +
         `redirect_uri=${encodeURIComponent(finalRedirectUri)}&` +
@@ -429,6 +451,12 @@ exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
   
   const { code, state, error } = req.query;
   
+  // === OAUTH CALLBACK DEBUGGING ===
+  logger.info("=== OAUTH CALLBACK DEBUGGING ===");
+  logger.info("Full query parameters:", {
+    query: req.query
+  });
+  
   // Log the incoming callback
   logger.info('Received OAuth callback', { 
     code: !!code,
@@ -506,13 +534,26 @@ exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
     integrationName: integration.name
   });
   
-  // Use the redirect URI from the integration config
+  // Use the redirect URI from the request query, or fallback to the one from the integration config
+  // Prioritize the redirect URI from the OAuth provider callback to match OAuth provider configuration
   // Always default to the production backend callback URL if nothing is provided
   const defaultRedirectUri = 'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
-  const finalRedirectUri = integration.redirectUri || defaultRedirectUri;
+  // Extract redirect_uri from query parameters if available
+  const queryRedirectUri = req.query.redirect_uri;
+  const finalRedirectUri = queryRedirectUri || integration.redirectUri || defaultRedirectUri;
+  
+  // === DETAILED CALLBACK REDIRECT URI DEBUGGING ===
+  logger.info("=== DETAILED CALLBACK REDIRECT URI DEBUGGING ===");
+  logger.info("Callback redirect URI details:", {
+    queryRedirectUri: queryRedirectUri,
+    dbRedirectUri: integration.redirectUri,
+    defaultRedirectUri: defaultRedirectUri,
+    finalRedirectUri: finalRedirectUri
+  });
   
   logger.info('Using redirect URI for OAuth callback processing', { 
     finalRedirectUri, 
+    queryRedirectUri: queryRedirectUri,
     integrationRedirectUri: integration.redirectUri
   });
   

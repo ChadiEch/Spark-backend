@@ -33,3 +33,5 @@
 {"timestamp":"2025-11-21T10:00:00.034Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
 {"timestamp":"2025-11-21T10:00:00.036Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
 {"timestamp":"2025-11-21T10:00:00.036Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T10:30:00.032Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T10:30:00.041Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}

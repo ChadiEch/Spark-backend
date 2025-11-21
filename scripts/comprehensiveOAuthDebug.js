@@ -7,13 +7,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Import models
 const Integration = require('../models/Integration');
-const IntegrationConnection = require('../models/IntegrationConnection');
-
-// Import utilities
-const Logger = require('../utils/logger');
-const { exchangeCodeForTokens, createOrUpdateConnection } = require('../utils/integrations/oauthUtils');
-
-const logger = new Logger('comprehensive-oauth-debug');
 
 // Connect to database
 const connectDB = async () => {
@@ -32,104 +25,138 @@ const connectDB = async () => {
   }
 };
 
-// Comprehensive OAuth debug
+// Comprehensive OAuth debugging
 const comprehensiveOAuthDebug = async () => {
   try {
     await connectDB();
     
-    console.log('=== COMPREHENSIVE OAUTH DEBUG ===\n');
+    console.log('=== COMPREHENSIVE OAUTH DEBUGGING ===\n');
     
-    // 1. Check all integrations
-    console.log('1. Checking all integrations in database:');
+    // 1. Check all integrations in database
+    console.log('1. DATABASE INTEGRATIONS:');
+    console.log('========================');
     const integrations = await Integration.find({});
-    console.log(`Found ${integrations.length} integrations:`);
-    integrations.forEach((integration, index) => {
-      console.log(`  ${index + 1}. ${integration.name} (${integration.key})`);
-      console.log(`     ID: ${integration._id}`);
-      console.log(`     Client ID: ${integration.clientId ? `${integration.clientId.substring(0, 20)}...` : 'MISSING'}`);
-      console.log(`     Redirect URI: ${integration.redirectUri}`);
-      console.log(`     Scopes: ${integration.scopes ? integration.scopes.join(', ') : 'NONE'}`);
-      console.log(`     Enabled: ${integration.enabled}`);
+    integrations.forEach(integration => {
+      console.log(`- ${integration.name} (${integration.key}):`);
+      console.log(`  Redirect URI: ${integration.redirectUri}`);
+      console.log(`  Client ID: ${integration.clientId ? integration.clientId.substring(0, 20) + '...' : 'NOT SET'}`);
+      console.log(`  Enabled: ${integration.enabled}`);
       console.log('');
     });
     
-    // 2. Check Google Drive integration specifically
-    console.log('2. Checking Google Drive integration specifically:');
+    // 2. Focus on Google Drive integration
+    console.log('2. GOOGLE DRIVE INTEGRATION DETAILS:');
+    console.log('====================================');
     const googleDriveIntegration = await Integration.findOne({ key: 'google-drive' });
+    
     if (!googleDriveIntegration) {
-      console.error('ERROR: Google Drive integration not found!');
+      console.error('ERROR: Google Drive integration not found in database!');
       process.exit(1);
     }
     
-    console.log(`Google Drive Integration Details:`);
-    console.log(`  ID: ${googleDriveIntegration._id}`);
-    console.log(`  Name: ${googleDriveIntegration.name}`);
-    console.log(`  Key: ${googleDriveIntegration.key}`);
-    console.log(`  Client ID: ${googleDriveIntegration.clientId}`);
-    console.log(`  Redirect URI: ${googleDriveIntegration.redirectUri}`);
-    console.log(`  Scopes: ${JSON.stringify(googleDriveIntegration.scopes)}`);
-    console.log(`  Enabled: ${googleDriveIntegration.enabled}`);
-    console.log('');
+    console.log(`Name: ${googleDriveIntegration.name}`);
+    console.log(`Key: ${googleDriveIntegration.key}`);
+    console.log(`ID: ${googleDriveIntegration._id}`);
+    console.log(`Redirect URI: ${googleDriveIntegration.redirectUri}`);
+    console.log(`Client ID: ${googleDriveIntegration.clientId ? 'SET' : 'NOT SET'}`);
+    console.log(`Client Secret: ${googleDriveIntegration.clientSecret ? 'SET' : 'NOT SET'}`);
+    console.log(`Scopes: ${JSON.stringify(googleDriveIntegration.scopes)}`);
+    console.log(`Enabled: ${googleDriveIntegration.enabled}`);
     
-    // 3. Check if there are existing connections
-    console.log('3. Checking existing connections:');
-    const connections = await IntegrationConnection.find({}).populate('integrationId');
-    console.log(`Found ${connections.length} connections:`);
-    connections.forEach((connection, index) => {
-      console.log(`  ${index + 1}. ${connection.integrationId?.name || 'Unknown'} connection`);
-      console.log(`     Connection ID: ${connection._id}`);
-      console.log(`     User ID: ${connection.userId}`);
-      console.log(`     Access Token: ${connection.accessToken ? 'PRESENT (ENCRYPTED)' : 'MISSING'}`);
-      console.log(`     Refresh Token: ${connection.refreshToken ? 'PRESENT (ENCRYPTED)' : 'MISSING'}`);
-      console.log(`     Expires: ${connection.expiresAt || 'NEVER'}`);
-      console.log('');
+    // 3. Simulate the exact OAuth flow
+    console.log('\n3. SIMULATING OAUTH FLOW:');
+    console.log('========================');
+    
+    // This is what the backend controller uses
+    const redirectUriToUse = googleDriveIntegration.redirectUri || 
+      'https://spark-backend-production-ab14.up.railway.app/api/integrations/callback';
+    
+    console.log(`Redirect URI to use: ${redirectUriToUse}`);
+    console.log(`Matches database value: ${redirectUriToUse === googleDriveIntegration.redirectUri}`);
+    
+    // Generate authorization URL exactly as the controller does
+    const state = JSON.stringify({ 
+      integrationId: googleDriveIntegration._id.toString(),
+      // In real flow, userId would be set from session
+      userId: 'debug_user_id'
     });
     
-    // 4. Test OAuth flow with mock data
-    console.log('4. Testing OAuth flow with mock data:');
-    try {
-      // Create mock token data
-      const mockTokenData = {
-        access_token: 'mock_access_token_12345',
-        refresh_token: 'mock_refresh_token_67890',
-        expires_in: 3600,
-        token_type: 'Bearer',
-        scope: 'https://www.googleapis.com/auth/drive'
-      };
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${googleDriveIntegration.clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUriToUse)}&` +
+      `scope=${encodeURIComponent(googleDriveIntegration.scopes.join(' '))}&` +
+      `response_type=code&` +
+      `access_type=offline&` +
+      `prompt=consent&` +
+      `state=${encodeURIComponent(state)}`;
       
-      // Test creating a connection
-      const testUserId = '6916ede023a4625ca577da28'; // Test user ID
-      console.log(`Creating connection for user ${testUserId}...`);
+    console.log(`\nGenerated Authorization URL:`);
+    console.log(`${authUrl.split('?')[0]}?${authUrl.split('?')[1].substring(0, 150)}...`);
+    
+    // Extract redirect_uri parameter
+    const urlParams = new URLSearchParams(authUrl.split('?')[1]);
+    const encodedRedirectUri = urlParams.get('redirect_uri');
+    if (encodedRedirectUri) {
+      const decodedRedirectUri = decodeURIComponent(encodedRedirectUri);
+      console.log(`\nDecoded redirect_uri parameter: ${decodedRedirectUri}`);
+      console.log(`Exact match with database: ${decodedRedirectUri === googleDriveIntegration.redirectUri}`);
       
-      const connection = await createOrUpdateConnection(googleDriveIntegration, testUserId, mockTokenData);
-      console.log('SUCCESS: Connection created/updated successfully');
-      console.log(`  Connection ID: ${connection._id}`);
-      console.log(`  Has Access Token: ${!!connection.accessToken}`);
-      console.log(`  Has Refresh Token: ${!!connection.refreshToken}`);
-      console.log('');
+      // Check for common issues
+      console.log('\n4. COMMON ISSUE CHECKS:');
+      console.log('======================');
       
-      // Verify the connection was saved
-      const savedConnection = await IntegrationConnection.findById(connection._id);
-      console.log('5. Verifying connection was saved to database:');
-      console.log(`  Connection exists in DB: ${!!savedConnection}`);
-      console.log(`  Access Token encrypted: ${!!savedConnection?.accessToken}`);
-      console.log(`  Refresh Token encrypted: ${!!savedConnection?.refreshToken}`);
-      console.log('');
+      // Check for trailing slash
+      if (decodedRedirectUri.endsWith('/') && !googleDriveIntegration.redirectUri.endsWith('/')) {
+        console.log('⚠️  WARNING: Decoded URI has trailing slash, database value does not');
+      } else if (!decodedRedirectUri.endsWith('/') && googleDriveIntegration.redirectUri.endsWith('/')) {
+        console.log('⚠️  WARNING: Database value has trailing slash, decoded URI does not');
+      }
       
-      // Clean up test connection
-      await IntegrationConnection.deleteOne({ _id: connection._id });
-      console.log('Test connection cleaned up.');
+      // Check for protocol
+      if (!decodedRedirectUri.startsWith('https://')) {
+        console.log('⚠️  WARNING: Decoded URI does not start with https://');
+      }
       
-    } catch (error) {
-      console.error('ERROR during connection test:', error.message);
-      console.error('Stack:', error.stack);
+      // Check for exact character match
+      if (decodedRedirectUri !== googleDriveIntegration.redirectUri) {
+        console.log('⚠️  WARNING: Character-by-character comparison shows differences:');
+        console.log(`  Decoded:  "${decodedRedirectUri}"`);
+        console.log(`  Database: "${googleDriveIntegration.redirectUri}"`);
+        
+        // Show character codes for debugging
+        for (let i = 0; i < Math.max(decodedRedirectUri.length, googleDriveIntegration.redirectUri.length); i++) {
+          const char1 = decodedRedirectUri[i] || '(none)';
+          const char2 = googleDriveIntegration.redirectUri[i] || '(none)';
+          if (char1 !== char2) {
+            console.log(`  Position ${i}: '${char1}' (${char1.charCodeAt(0)}) vs '${char2}' (${char2.charCodeAt(0)})`);
+          }
+        }
+      }
     }
     
-    console.log('=== DEBUG COMPLETE ===');
+    // 5. Check environment variables
+    console.log('\n5. ENVIRONMENT VARIABLES:');
+    console.log('========================');
+    console.log(`NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}`);
+    console.log(`MONGO_URI: ${process.env.MONGO_URI ? 'SET' : 'NOT SET'}`);
+    console.log(`GOOGLE_DRIVE_CLIENT_ID: ${process.env.GOOGLE_DRIVE_CLIENT_ID ? 'SET' : 'NOT SET'}`);
+    console.log(`GOOGLE_DRIVE_CLIENT_SECRET: ${process.env.GOOGLE_DRIVE_CLIENT_SECRET ? 'SET' : 'NOT SET'}`);
+    
+    // 6. Recommendations
+    console.log('\n6. RECOMMENDATIONS:');
+    console.log('==================');
+    console.log('If you\'re still having issues:');
+    console.log('1. Double-check that the exact URI is registered in Google OAuth Console:');
+    console.log(`   ${googleDriveIntegration.redirectUri}`);
+    console.log('2. Make sure there are no extra spaces or characters in the Google Console');
+    console.log('3. Try removing and re-adding the URI in Google Console');
+    console.log('4. Check that your Google Drive Client ID and Secret are correct');
+    console.log('5. Make sure you\'re using the correct Google Cloud project');
+    
     process.exit(0);
   } catch (error) {
-    console.error('Error during comprehensive OAuth debug:', error.message);
-    console.error('Stack:', error.stack);
+    console.error('Error during comprehensive OAuth debugging:', error.message);
+    console.error(error.stack);
     process.exit(1);
   }
 };

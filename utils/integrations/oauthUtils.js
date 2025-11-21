@@ -81,6 +81,8 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
     
     const { clientId, clientSecret } = getIntegrationCredentials(integrationKey, integration);
     
+    // === TOKEN EXCHANGE DEBUGGING ===
+    logger.info("=== TOKEN EXCHANGE DEBUGGING ===");
     logger.info('Exchanging code for tokens', { 
       integrationKey, 
       code: code ? 'present' : 'missing',

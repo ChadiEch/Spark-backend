@@ -35,3 +35,27 @@
 {"timestamp":"2025-11-21T10:00:00.036Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
 {"timestamp":"2025-11-21T10:30:00.032Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
 {"timestamp":"2025-11-21T10:30:00.041Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T11:00:00.048Z","level":"INFO","message":"[metrics-collection-service] Starting metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T11:00:00.062Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T11:00:00.067Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T11:00:00.071Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T11:30:00.029Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T11:30:00.031Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T12:00:00.053Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T12:00:00.070Z","level":"INFO","message":"[metrics-collection-service] Starting metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T12:00:00.074Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T12:00:00.078Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T12:30:00.040Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T12:30:00.060Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T13:00:00.057Z","level":"INFO","message":"[metrics-collection-service] Starting metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T13:00:00.077Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T13:00:00.082Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T13:00:00.088Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T13:30:00.025Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T13:30:00.040Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T14:00:00.037Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T14:00:00.027Z","level":"INFO","message":"[metrics-collection-service] Starting metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T14:00:00.043Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T14:00:00.042Z","level":"INFO","message":"[metrics-collection-service] No published posts found for metrics collection","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T14:30:00.029Z","level":"INFO","message":"[integration-monitoring-service] Starting integration status check","meta":{},"pid":17508}
+{"timestamp":"2025-11-21T14:30:00.041Z","level":"INFO","message":"[integration-monitoring-service] No integration connections found for status check","meta":{},"pid":17508}

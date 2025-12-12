@@ -301,6 +301,33 @@ if (process.env.NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'tr
 // This should be the last middleware to catch all unhandled errors
 app.use(errorHandler);
 
+// Initialize integrations on startup if needed
+const initializeIntegrations = async () => {
+  try {
+    // Only run initialization in Railway production environment
+    if (process.env.NODE_ENV === 'production' && process.env.RAILWAY_ENVIRONMENT) {
+      console.log('Initializing integrations for Railway deployment...');
+      
+      // You can add initialization logic here if needed
+      // For example, checking if integrations exist and creating them if not
+    }
+  } catch (error) {
+    console.error('Error initializing integrations:', error.message);
+  }
+};
+
+// Call initialization
+initializeIntegrations().then(() => {
+  // Start the server after initialization
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Failed to initialize:', err);
+  process.exit(1);
+});
+
 // Function to start server with port conflict handling
 // Automatically tries different ports if the preferred port is in use
 const startServer = (port) => {

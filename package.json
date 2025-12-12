@@ -26,6 +26,11 @@
     "generate-encryption-key": "node scripts/generateEncryptionKey.js",
     "validate-env": "node scripts/validateEnv.js",
     "test-integrations": "node scripts/testIntegrations.js",
+    "reset-integrations": "node scripts/resetAndRebuildIntegrations.js",
+    "update-credentials": "node scripts/updateCredentialsFromEnv.js",
+    "check-integrations": "node scripts/checkCurrentIntegrations.js",
+    "configure-google-drive": "node scripts/configureGoogleDrive.js",
+    "railway-init": "node scripts/railwayInit.js",
     "postinstall": "chmod +x node_modules/.bin/nodemon || true"
   },
   "dependencies": {

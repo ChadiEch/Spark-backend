@@ -31,6 +31,7 @@
     "check-integrations": "node scripts/checkCurrentIntegrations.js",
     "configure-google-drive": "node scripts/configureGoogleDrive.js",
     "railway-init": "node scripts/railwayInit.js",
+    "test-init": "node scripts/testInit.js",
     "postinstall": "chmod +x node_modules/.bin/nodemon || true"
   },
   "dependencies": {

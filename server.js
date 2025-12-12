@@ -40,78 +40,29 @@ const initializeIntegrationsIfNeeded = async () => {
     if (integrationCount === 0) {
       logger.info('No integrations found, initializing default integrations...');
       
-      // // Define the default integrations
-      // const defaultIntegrations = [
-      //   {
-      //     name: 'Instagram',
-      //     description: 'Connect your Instagram Business account',
-      //     key: 'instagram',
-      //     icon: 'instagram',
-      //     category: 'social',
-      //     clientId: process.env.INSTAGRAM_CLIENT_ID || 'instagram_client_id',
-      //     clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'instagram_client_secret',
-      //     redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
-      //     scopes: ['read', 'write'],
-      //     enabled: true
-      //   },
-      //   {
-      //     name: 'Facebook',
-      //     description: 'Manage Facebook Pages and ads',
-      //     key: 'facebook',
-      //     icon: 'facebook',
-      //     category: 'social',
-      //     clientId: process.env.FACEBOOK_CLIENT_ID,
-      //     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      //     redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
-      //     scopes: ['read', 'write'],
-      //     enabled: true
-      //   },
-      //   {
-      //     name: 'TikTok',
-      //     description: 'Schedule and publish TikTok videos',
-      //     key: 'tiktok',
-      //     icon: 'tiktok',
-      //     category: 'social',
-      //     clientId: process.env.TIKTOK_CLIENT_KEY,
-      //     clientSecret: process.env.TIKTOK_CLIENT_SECRET,
-      //     redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
-      //     scopes: ['read', 'write'],
-      //     enabled: true
-      //   },
-      //   {
-      //     name: 'YouTube',
-      //     description: 'Upload and manage YouTube content',
-      //     key: 'youtube',
-      //     icon: 'youtube',
-      //     category: 'social',
-      //     clientId: process.env.YOUTUBE_CLIENT_ID,
-      //     clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
-      //     redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
-      //     scopes: [
-      //       'https://www.googleapis.com/auth/youtube',
-      //       'https://www.googleapis.com/auth/youtube.upload'
-      //     ],
-      //     enabled: true
-      //   },
-      //   {
-      //     name: 'Google Drive',
-      //     description: 'Connect your Google Drive for file storage and sharing',
-      //     key: 'google-drive',
-      //     icon: 'google-drive',
-      //     category: 'storage',
-      //     clientId: process.env.GOOGLE_DRIVE_CLIENT_ID,
-      //     clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET,
-      //     redirectUri: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/integrations/callback` : 'http://localhost:5173/integrations/callback',
-      //     scopes: [
-      //       'https://www.googleapis.com/auth/drive'
-      //     ],
-      //     enabled: true
-      //   }
-      // ];
+      // Use the initializeIntegrations script instead of hardcoded values
+      const { spawn } = require('child_process');
+      const path = require('path');
       
-      // // Insert the default integrations
-      // const integrations = await Integration.insertMany(defaultIntegrations);
-      logger.info(`Successfully initialized ${integrations.length} integrations`);
+      // Run the initialization script
+      logger.info('Running integration initialization script...');
+      const initScript = spawn('node', [path.join(__dirname, 'scripts', 'initializeIntegrations.js')]);
+      
+      initScript.stdout.on('data', (data) => {
+        logger.info(`Initialization script stdout: ${data}`);
+      });
+      
+      initScript.stderr.on('data', (data) => {
+        logger.warn(`Initialization script stderr: ${data}`);
+      });
+      
+      initScript.on('close', (code) => {
+        if (code === 0) {
+          logger.info('Integration initialization script completed successfully');
+        } else {
+          logger.error(`Integration initialization script exited with code ${code}`);
+        }
+      });
     } else {
       logger.info(`Found ${integrationCount} existing integrations, skipping initialization`);
     }
@@ -300,33 +251,6 @@ if (process.env.NODE_ENV === 'development' || process.env.SERVE_FRONTEND === 'tr
 // Error handling middleware
 // This should be the last middleware to catch all unhandled errors
 app.use(errorHandler);
-
-// Initialize integrations on startup if needed
-const initializeIntegrations = async () => {
-  try {
-    // Only run initialization in Railway production environment
-    if (process.env.NODE_ENV === 'production' && process.env.RAILWAY_ENVIRONMENT) {
-      console.log('Initializing integrations for Railway deployment...');
-      
-      // You can add initialization logic here if needed
-      // For example, checking if integrations exist and creating them if not
-    }
-  } catch (error) {
-    console.error('Error initializing integrations:', error.message);
-  }
-};
-
-// Call initialization
-initializeIntegrations().then(() => {
-  // Start the server after initialization
-  const PORT = process.env.PORT || 5001;
-  app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  });
-}).catch(err => {
-  console.error('Failed to initialize:', err);
-  process.exit(1);
-});
 
 // Function to start server with port conflict handling
 // Automatically tries different ports if the preferred port is in use

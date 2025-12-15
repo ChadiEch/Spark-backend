@@ -1,7 +1,6 @@
-// Script to update integration credentials
+// Script to update integration credentials from environment variables
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const readline = require('readline');
 const path = require('path');
 
 // Load environment variables
@@ -9,12 +8,6 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Import models
 const Integration = require('../models/Integration');
-
-// Create interface for reading user input
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
 // Connect to database
 const connectDB = async () => {
@@ -33,51 +26,54 @@ const connectDB = async () => {
   }
 };
 
-// Function to ask user for input
-const askQuestion = (question) => {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer);
-    });
-  });
-};
-
-// Update integration credentials
-const updateCredentials = async () => {
+// Update integration credentials from environment variables
+const updateIntegrationCredentials = async () => {
   try {
     await connectDB();
     
-    console.log('=== UPDATE INTEGRATION CREDENTIALS ===\n');
+    console.log('=== UPDATING INTEGRATION CREDENTIALS FROM ENVIRONMENT VARIABLES ===\n');
     
-    // Get all integrations
-    const integrations = await Integration.find({});
+    // Define mapping of integration keys to environment variable names
+    const credentialMapping = {
+      'google-drive': {
+        name: 'Google Drive',
+        clientIdEnvVar: 'GOOGLE_DRIVE_CLIENT_ID',
+        clientSecretEnvVar: 'GOOGLE_DRIVE_CLIENT_SECRET'
+      },
+      'youtube': {
+        name: 'YouTube',
+        clientIdEnvVar: 'YOUTUBE_CLIENT_ID',
+        clientSecretEnvVar: 'YOUTUBE_CLIENT_SECRET'
+      },
+      'facebook': {
+        name: 'Facebook',
+        clientIdEnvVar: 'FACEBOOK_APP_ID',
+        clientSecretEnvVar: 'FACEBOOK_APP_SECRET'
+      },
+      'instagram': {
+        name: 'Instagram',
+        clientIdEnvVar: 'INSTAGRAM_APP_ID',
+        clientSecretEnvVar: 'INSTAGRAM_APP_SECRET'
+      }
+    };
     
-    if (integrations.length === 0) {
-      console.log('No integrations found. Please run the resetAndRebuildIntegrations.js script first.');
-      process.exit(1);
-    }
-    
-    console.log('Found the following integrations:');
-    integrations.forEach((integration, index) => {
-      console.log(`${index + 1}. ${integration.name} (${integration.key})`);
-    });
-    
-    console.log('\n=== UPDATING CREDENTIALS ===');
-    
-    for (const integration of integrations) {
-      console.log(`\n--- Updating ${integration.name} ---`);
+    // Update each integration
+    for (const [key, config] of Object.entries(credentialMapping)) {
+      const integration = await Integration.findOne({ key });
       
-      // Skip if this is a local/test environment and user doesn't have real credentials
-      const skip = await askQuestion(`Do you have real credentials for ${integration.name}? (y/n): `);
-      
-      if (skip.toLowerCase() !== 'y') {
-        console.log(`Skipping ${integration.name}...`);
+      if (!integration) {
+        console.log(`⚠️  ${config.name} integration not found, skipping...`);
         continue;
       }
       
-      // Ask for client ID and secret
-      const clientId = await askQuestion(`Enter Client ID for ${integration.name}: `);
-      const clientSecret = await askQuestion(`Enter Client Secret for ${integration.name}: `);
+      const clientId = process.env[config.clientIdEnvVar];
+      const clientSecret = process.env[config.clientSecretEnvVar];
+      
+      if (!clientId || !clientSecret) {
+        console.log(`⚠️  Environment variables for ${config.name} not found, skipping...`);
+        console.log(`   Looking for: ${config.clientIdEnvVar}, ${config.clientSecretEnvVar}`);
+        continue;
+      }
       
       // Update the integration
       const updatedIntegration = await Integration.findByIdAndUpdate(
@@ -90,7 +86,7 @@ const updateCredentials = async () => {
         { new: true }
       );
       
-      console.log(`✅ Updated ${updatedIntegration.name} with new credentials`);
+      console.log(`✅ Updated ${updatedIntegration.name} with credentials from environment variables`);
     }
     
     console.log('\n=== VERIFICATION ===');
@@ -102,16 +98,14 @@ const updateCredentials = async () => {
     });
     
     console.log('=== CREDENTIAL UPDATE COMPLETE ===');
-    console.log('All integrations have been updated with your credentials.');
+    console.log('All integrations have been updated with credentials from environment variables.');
     console.log('Remember to restart your backend server to load the new configurations.');
     
-    rl.close();
     process.exit(0);
   } catch (error) {
     console.error('Error updating credentials:', error.message);
-    rl.close();
     process.exit(1);
   }
 };
 
-updateCredentials();
+updateIntegrationCredentials();

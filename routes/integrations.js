@@ -2,10 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const integrationController = require('../controllers/integrationController');
-const { getMetrics } = require('../utils/integrations/monitoring');
-
-// POST /api/integrations/initialize - Initialize integrations collection (public)
-router.post('/initialize', integrationController.initializeIntegrations);
 
 // POST /api/integrations/exchange - Exchange OAuth code for tokens (public)
 // This endpoint needs to be public because it's called during OAuth callback flow
@@ -42,23 +38,6 @@ router.get('/connections/:id/status', integrationController.getConnectionStatus)
 
 // POST /api/integrations/google-drive/upload - Upload file to Google Drive
 router.post('/google-drive/upload', integrationController.uploadToGoogleDrive);
-
-// GET /api/integrations/metrics - Get integration metrics (admin only)
-router.get('/metrics', authorize('admin'), (req, res) => {
-  try {
-    const metrics = getMetrics();
-    res.status(200).json({
-      success: true,
-      data: metrics
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
-  }
-});
 
 // GET /api/integrations/metrics/health - Get integration health metrics
 router.get('/metrics/health', integrationController.getIntegrationMetrics);

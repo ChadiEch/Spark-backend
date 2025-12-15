@@ -1,10 +1,4 @@
-#!/usr/bin/env node
-
-/**
- * Script to initialize integrations collection with default integrations
- * Usage: node initializeIntegrations.js
- */
-
+// Script to initialize default integrations
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
@@ -19,12 +13,6 @@ const Integration = require('../models/Integration');
 const connectDB = async () => {
   try {
     console.log('Connecting to MongoDB...');
-    console.log('MONGO_URI:', process.env.MONGO_URI);
-    
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI environment variable is not set');
-    }
-    
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -38,95 +26,124 @@ const connectDB = async () => {
   }
 };
 
-// Initialize integrations
+// Initialize default integrations
 const initializeIntegrations = async () => {
   try {
     await connectDB();
     
-    // Define the default integrations
+    console.log('=== INITIALIZING DEFAULT INTEGRATIONS ===\n');
+    
+    // Define default integrations
     const defaultIntegrations = [
       {
-        name: 'Instagram',
-        description: 'Connect your Instagram Business account',
-        key: 'instagram',
-        icon: 'instagram',
-        category: 'social',
-        clientId: process.env.INSTAGRAM_CLIENT_ID || 'instagram_client_id',
-        clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || 'instagram_client_secret',
-        redirectUri: 'http://localhost:5001/api/integrations/callback',
-        scopes: ['read', 'write'],
-        enabled: true
-      },
-      {
-        name: 'Facebook',
-        description: 'Manage Facebook Pages and ads',
-        key: 'facebook',
-        icon: 'facebook',
-        category: 'social',
-        clientId: process.env.FACEBOOK_CLIENT_ID || 'facebook_client_id',
-        clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'facebook_client_secret',
-        redirectUri: 'http://localhost:5001/api/integrations/callback',
-        scopes: ['read', 'write'],
-        enabled: true
-      },
-      {
-        name: 'TikTok',
-        description: 'Schedule and publish TikTok videos',
-        key: 'tiktok',
-        icon: 'tiktok',
-        category: 'social',
-        clientId: process.env.TIKTOK_CLIENT_KEY || 'tiktok_client_key',
-        clientSecret: process.env.TIKTOK_CLIENT_SECRET || 'tiktok_client_secret',
-        redirectUri: 'http://localhost:5001/api/integrations/callback',
-        scopes: ['read', 'write'],
+        name: 'Google Drive',
+        key: 'google-drive',
+        category: 'storage',
+        description: 'Connect to Google Drive for file storage and management',
+        icon: 'google-drive',
+        clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'your_google_drive_client_id',
+        clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'your_google_drive_client_secret',
+        redirectUri: process.env.FRONTEND_URL ? 
+          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+          'http://localhost:5001/api/integrations/callback',
+        scopes: ['https://www.googleapis.com/auth/drive'],
         enabled: true
       },
       {
         name: 'YouTube',
-        description: 'Upload and manage YouTube content',
         key: 'youtube',
-        icon: 'youtube',
         category: 'social',
-        clientId: process.env.YOUTUBE_CLIENT_ID || 'youtube_client_id',
-        clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'youtube_client_secret',
-        redirectUri: 'http://localhost:5001/api/integrations/callback',
-        scopes: [
-          'https://www.googleapis.com/auth/youtube',
-          'https://www.googleapis.com/auth/youtube.upload'
-        ],
+        description: 'Connect to YouTube for video management',
+        icon: 'youtube',
+        clientId: process.env.YOUTUBE_CLIENT_ID || 'your_youtube_client_id',
+        clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'your_youtube_client_secret',
+        redirectUri: process.env.FRONTEND_URL ? 
+          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+          'http://localhost:5001/api/integrations/callback',
+        scopes: ['https://www.googleapis.com/auth/youtube'],
         enabled: true
       },
       {
-        name: 'Google Drive',
-        description: 'Connect your Google Drive for file storage and sharing',
-        key: 'google-drive',
-        icon: 'google-drive',
-        category: 'storage',
-        clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'google_drive_client_id',
-        clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'google_drive_client_secret',
-        redirectUri: 'http://localhost:5001/api/integrations/callback',
-        scopes: [
-          'https://www.googleapis.com/auth/drive'
-        ],
+        name: 'Facebook',
+        key: 'facebook',
+        category: 'social',
+        description: 'Connect to Facebook for social media management',
+        icon: 'facebook',
+        clientId: process.env.FACEBOOK_APP_ID || 'your_facebook_app_id',
+        clientSecret: process.env.FACEBOOK_APP_SECRET || 'your_facebook_app_secret',
+        redirectUri: process.env.FRONTEND_URL ? 
+          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+          'http://localhost:5001/api/integrations/callback',
+        scopes: ['pages_manage_posts', 'pages_read_engagement'],
+        enabled: true
+      },
+      {
+        name: 'Instagram',
+        key: 'instagram',
+        category: 'social',
+        description: 'Connect to Instagram for social media management',
+        icon: 'instagram',
+        clientId: process.env.INSTAGRAM_APP_ID || 'your_instagram_app_id',
+        clientSecret: process.env.INSTAGRAM_APP_SECRET || 'your_instagram_app_secret',
+        redirectUri: process.env.FRONTEND_URL ? 
+          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+          'http://localhost:5001/api/integrations/callback',
+        scopes: ['instagram_basic', 'instagram_content_publish'],
         enabled: true
       }
     ];
     
-    // Remove existing integrations
-    await Integration.deleteMany({});
+    // Check if integrations already exist
+    const existingCount = await Integration.countDocuments();
+    if (existingCount > 0) {
+      console.log(`Found ${existingCount} existing integrations. Skipping initialization.`);
+      process.exit(0);
+    }
     
-    // Insert the default integrations
-    const integrations = await Integration.insertMany(defaultIntegrations);
+    console.log('Creating default integrations...\n');
     
-    console.log('Integrations collection initialized successfully');
-    console.log(`Inserted ${integrations.length} integrations:`);
-    integrations.forEach(integration => {
-      console.log(`- ${integration.name} (${integration.key}): ${integration.redirectUri}`);
+    // Create integrations
+    for (const integrationData of defaultIntegrations) {
+      console.log(`Creating ${integrationData.name} integration...`);
+      
+      const integration = new Integration(integrationData);
+      await integration.save();
+      
+      console.log(`✅ Created ${integration.name} with ID: ${integration._id}`);
+      console.log(`   Redirect URI: ${integration.redirectUri}`);
+      console.log(`   Scopes: ${integration.scopes.join(', ')}\n`);
+    }
+    
+    // Verify creation
+    const totalCount = await Integration.countDocuments();
+    console.log(`\n=== VERIFICATION ===`);
+    console.log(`Total integrations in database: ${totalCount}`);
+    
+    if (totalCount === defaultIntegrations.length) {
+      console.log('✅ All integrations created successfully');
+    } else {
+      console.log('❌ Warning: Integration count mismatch');
+    }
+    
+    // Display all created integrations
+    const allIntegrations = await Integration.find({}, { clientId: 0, clientSecret: 0 }); // Exclude sensitive fields
+    console.log('\n=== CREATED INTEGRATIONS ===');
+    allIntegrations.forEach(integration => {
+      console.log(`${integration.name} (${integration.key})`);
+      console.log(`  Redirect URI: ${integration.redirectUri}`);
+      console.log(`  Scopes: ${integration.scopes.join(', ')}`);
+      console.log(`  Active: ${integration.enabled}\n`);
     });
+    
+    console.log('=== INITIALIZATION COMPLETE ===');
+    console.log('Default integrations have been initialized.');
+    console.log('\nNext steps:');
+    console.log('1. Update each integration with your actual OAuth credentials');
+    console.log('2. Restart your backend server to load the new configurations');
     
     process.exit(0);
   } catch (error) {
-    console.error('Error initializing integrations collection:', error.message);
+    console.error('Error initializing integrations:', error.message);
     process.exit(1);
   }
 };

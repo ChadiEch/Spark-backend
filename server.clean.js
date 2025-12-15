@@ -13,9 +13,6 @@ const Logger = require('./utils/logger');
 const { rateLimiter, apiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./middleware/errorHandler');
 const { monitoring, getMetrics } = require('./middleware/monitoring');
-const ScheduledPostingService = require('./utils/integrations/scheduledPostingService');
-const MetricsCollectionService = require('./utils/integrations/metricsCollectionService');
-const IntegrationMonitoringService = require('./utils/integrations/integrationMonitoringService');
 
 // Initialize logger for server-level logging
 const logger = new Logger('server');
@@ -44,10 +41,6 @@ const activityRoutes = require('./routes/activities');
 const invitationRoutes = require('./routes/invitations');
 const securityRoutes = require('./routes/security');
 const webhookRoutes = require('./routes/webhooks');
-const integrationRoutes = require('./routes/integrations');
-
-// Import models for initialization
-const Integration = require('./models/Integration');
 
 // Import middleware
 const { checkDBConnection } = require('./middleware/dbConnection');
@@ -60,52 +53,6 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const PORT = process.env.PORT || 5001; // Use PORT from environment or default to 5001
-
-// Function to automatically initialize integrations if they don't exist
-const initializeIntegrationsIfNeeded = async () => {
-  try {
-    // Only run if database is connected
-    if (!mongoose.connection.readyState) {
-      logger.warn('Database not connected, skipping integrations initialization');
-      return;
-    }
-    
-    // Check if integrations already exist
-    const integrationCount = await Integration.countDocuments({});
-    
-    if (integrationCount === 0) {
-      logger.info('No integrations found, initializing default integrations...');
-      
-      // Use the initializeIntegrations script instead of hardcoded values
-      const { spawn } = require('child_process');
-      const path = require('path');
-      
-      // Run the initialization script
-      logger.info('Running integration initialization script...');
-      const initScript = spawn('node', [path.join(__dirname, 'scripts', 'initializeIntegrations.js')]);
-      
-      initScript.stdout.on('data', (data) => {
-        logger.info(`Initialization script stdout: ${data}`);
-      });
-      
-      initScript.stderr.on('data', (data) => {
-        logger.warn(`Initialization script stderr: ${data}`);
-      });
-      
-      initScript.on('close', (code) => {
-        if (code === 0) {
-          logger.info('Integration initialization script completed successfully');
-        } else {
-          logger.error(`Integration initialization script exited with code ${code}`);
-        }
-      });
-    } else {
-      logger.info(`Found ${integrationCount} existing integrations, skipping initialization`);
-    }
-  } catch (error) {
-    logger.error('Error initializing integrations:', { error: error.message });
-  }
-};
 
 // Apply rate limiting middleware globally
 // Protects against brute force and DDoS attacks
@@ -177,7 +124,6 @@ app.use('/api/activities', checkDBConnection, activityRoutes);
 app.use('/api/invitations', checkDBConnection, invitationRoutes);
 app.use('/api/security', checkDBConnection, securityRoutes);
 app.use('/api/webhooks', checkDBConnection, webhookRoutes);
-app.use('/api/integrations', checkDBConnection, integrationRoutes);
 
 // Serve static files in production
 // Allows serving built frontend files directly from backend
@@ -205,9 +151,6 @@ connectDB()
         app.set('dbConnected', dbConnected);
       }
       logger.info('Database connected successfully');
-      
-      // Initialize integrations if needed
-      await initializeIntegrationsIfNeeded();
     } else {
       // Log warning when database is not available but server can still start
       logger.warn('Database connection not established - running in limited mode');
@@ -223,16 +166,6 @@ connectDB()
     logger.info('Starting server without database connection...');
     logger.warn('Note: Some features may not work without a database connection');
   });
-
-// Initialize integration monitoring service
-const integrationMonitoringService = new IntegrationMonitoringService();
-const scheduledPostingService = new ScheduledPostingService();
-const metricsCollectionService = new MetricsCollectionService();
-
-// Start integration monitoring service
-integrationMonitoringService.start();
-scheduledPostingService.start();
-metricsCollectionService.start();
 
 // Function to start server with port conflict handling
 // Automatically tries different ports if the preferred port is in use

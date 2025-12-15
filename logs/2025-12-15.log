@@ -1,0 +1,8 @@
+{"timestamp":"2025-12-15T06:34:41.622Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.632Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.632Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.633Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.633Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.633Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.683Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T06:34:41.763Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":26956}

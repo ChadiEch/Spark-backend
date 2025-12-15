@@ -6,3 +6,89 @@
 {"timestamp":"2025-12-15T06:34:41.633Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":26956}
 {"timestamp":"2025-12-15T06:34:41.683Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":26956}
 {"timestamp":"2025-12-15T06:34:41.763Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":26956}
+{"timestamp":"2025-12-15T07:04:49.760Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.737Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.761Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.760Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.762Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.761Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.803Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:04:49.869Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":32400}
+{"timestamp":"2025-12-15T07:23:53.538Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":8500}
+{"timestamp":"2025-12-15T07:23:53.584Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":8500}
+{"timestamp":"2025-12-15T07:23:53.650Z","level":"INFO","message":"[server] Server is running on port 5002","meta":{},"pid":8500}
+{"timestamp":"2025-12-15T07:23:53.651Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5002/api/health","meta":{},"pid":8500}
+{"timestamp":"2025-12-15T07:23:53.651Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5002/api/metrics","meta":{},"pid":8500}
+{"timestamp":"2025-12-15T07:23:53.699Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":8500}
+{"timestamp":"2025-12-15T07:25:57.260Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:25:57.279Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:25:57.322Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:25:57.378Z","level":"WARN","message":"[server] Port 5002 is already in use. Trying port 5003...","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:25:57.489Z","level":"INFO","message":"[server] Server is running on port 5003","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:25:57.490Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5003/api/health","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:25:57.490Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5003/api/metrics","meta":{},"pid":31820}
+{"timestamp":"2025-12-15T07:26:26.959Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:26.961Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:26.961Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:26.962Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:26.961Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:26.962Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:26.980Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:26:27.022Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":22620}
+{"timestamp":"2025-12-15T07:29:10.814Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":10740}
+{"timestamp":"2025-12-15T07:29:10.843Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":10740}
+{"timestamp":"2025-12-15T07:29:10.907Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":10740}
+{"timestamp":"2025-12-15T07:29:10.920Z","level":"INFO","message":"[server] Server is running on port 5002","meta":{},"pid":10740}
+{"timestamp":"2025-12-15T07:29:10.922Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5002/api/metrics","meta":{},"pid":10740}
+{"timestamp":"2025-12-15T07:29:10.921Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5002/api/health","meta":{},"pid":10740}
+{"timestamp":"2025-12-15T07:31:38.998Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.004Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.003Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.008Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.005Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.007Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.061Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:31:39.156Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":3760}
+{"timestamp":"2025-12-15T07:33:18.491Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":8384}
+{"timestamp":"2025-12-15T07:33:18.554Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":8384}
+{"timestamp":"2025-12-15T07:33:18.603Z","level":"INFO","message":"[server] Server is running on port 5002","meta":{},"pid":8384}
+{"timestamp":"2025-12-15T07:33:18.604Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5002/api/health","meta":{},"pid":8384}
+{"timestamp":"2025-12-15T07:33:18.605Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5002/api/metrics","meta":{},"pid":8384}
+{"timestamp":"2025-12-15T07:33:18.635Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":8384}
+{"timestamp":"2025-12-15T09:12:01.419Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:12:01.485Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:12:01.533Z","level":"WARN","message":"[server] Port 5002 is already in use. Trying port 5003...","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:12:01.650Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5003/api/health","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:12:01.648Z","level":"INFO","message":"[server] Server is running on port 5003","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:12:01.650Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5003/api/metrics","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:12:01.666Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":34040}
+{"timestamp":"2025-12-15T09:14:46.943Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:46.973Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:47.018Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:47.046Z","level":"WARN","message":"[server] Port 5002 is already in use. Trying port 5003...","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:47.155Z","level":"WARN","message":"[server] Port 5003 is already in use. Trying port 5004...","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:47.268Z","level":"INFO","message":"[server] Server is running on port 5004","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:47.269Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5004/api/health","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:14:47.270Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5004/api/metrics","meta":{},"pid":19828}
+{"timestamp":"2025-12-15T09:15:43.350Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.352Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.353Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.353Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.352Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.354Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.376Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:15:43.423Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":30204}
+{"timestamp":"2025-12-15T09:18:57.433Z","level":"INFO","message":"[server] Server is running on port 5001","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.438Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5001/api/health","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.440Z","level":"WARN","message":"[server] WARNING: Database not connected!","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.439Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5001/api/metrics","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.443Z","level":"WARN","message":"[server] Please check your MongoDB installation or database configuration.","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.442Z","level":"WARN","message":"[server] Some features may not work properly.","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.508Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:18:57.582Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":17476}
+{"timestamp":"2025-12-15T09:30:49.138Z","level":"WARN","message":"[server] Port 5001 is already in use. Trying port 5002...","meta":{},"pid":12360}
+{"timestamp":"2025-12-15T09:30:49.199Z","level":"INFO","message":"[server] Database connected successfully","meta":{},"pid":12360}
+{"timestamp":"2025-12-15T09:30:49.249Z","level":"INFO","message":"[server] Server is running on port 5002","meta":{},"pid":12360}
+{"timestamp":"2025-12-15T09:30:49.250Z","level":"INFO","message":"[server] Health check endpoint: http://localhost:5002/api/health","meta":{},"pid":12360}
+{"timestamp":"2025-12-15T09:30:49.251Z","level":"INFO","message":"[server] Metrics endpoint: http://localhost:5002/api/metrics","meta":{},"pid":12360}
+{"timestamp":"2025-12-15T09:30:49.386Z","level":"INFO","message":"[server] Found 4 existing integrations, skipping initialization","meta":{},"pid":12360}

@@ -5,7 +5,7 @@ builder = "nixpacks"
 startCommand = "node server.js"
 
 [variables]
-NODE_VERSION = "20"
+NODE_VERSION = "20.19.0"
 
 [env]
 FRONTEND_URL = "https://spark-frontend-production.up.railway.app"

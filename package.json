@@ -22,6 +22,7 @@
     "postinstall": "chmod +x node_modules/.bin/nodemon || true"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.2.12",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",

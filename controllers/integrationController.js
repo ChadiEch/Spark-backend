@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const axios = require('axios');
 const Integration = require('../models/Integration');
 const IntegrationConnection = require('../models/IntegrationConnection');
 const { exchangeCodeForTokens, refreshOAuthTokens, createOrUpdateConnection, getIntegrationCredentials } = require('../utils/integrations/oauthUtils');

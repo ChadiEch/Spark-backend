@@ -14,19 +14,21 @@ const metricsStore = {
 
 // Clean up old metrics periodically
 setInterval(() => {
-  // Keep only last 1000 response times
-  if (metricsStore.responseTimes.length > 1000) {
-    metricsStore.responseTimes = metricsStore.responseTimes.slice(-1000);
-  }
-  
-  // Clean up old route metrics
-  const now = Date.now();
-  for (const [key, value] of metricsStore.routes.entries()) {
-    // Remove entries older than 1 hour
-    if (now - value.timestamp > 3600000) {
-      metricsStore.routes.delete(key);
+  setImmediate(() => {
+    // Keep only last 1000 response times
+    if (metricsStore.responseTimes.length > 1000) {
+      metricsStore.responseTimes = metricsStore.responseTimes.slice(-1000);
     }
-  }
+    
+    // Clean up old route metrics
+    const now = Date.now();
+    for (const [key, value] of metricsStore.routes.entries()) {
+      // Remove entries older than 1 hour
+      if (now - value.timestamp > 3600000) {
+        metricsStore.routes.delete(key);
+      }
+    }
+  });
 }, 300000); // Clean up every 5 minutes
 
 /**

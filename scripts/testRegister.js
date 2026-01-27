@@ -4,7 +4,7 @@ const testRegister = async () => {
   try {
     console.log('Testing registration endpoint...');
     
-    const response = await axios.post('http://localhost:5002/api/auth/register', {
+    const response = await axios.post('http://localhost:5001/api/auth/register', {
       name: 'Test User API New',
       email: 'testapinew@example.com',
       password: 'password123'

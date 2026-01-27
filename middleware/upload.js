@@ -1,17 +1,16 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    // Create unique filename
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Ensure uploads directory exists
+const uploadsDir = 'uploads/';
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Use memory storage to support both local and cloud uploads
+// The controller will decide where to store the file
+const storage = multer.memoryStorage();
 
 // File filter to only allow certain file types
 const fileFilter = (req, file, cb) => {
@@ -30,13 +29,23 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Create upload middleware
+// Create upload middleware with memory storage
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 50 * 1024 * 1024 // 50MB limit for videos
   }
 });
 
+// Helper to save buffer to local file (used when Google Drive is not connected)
+const saveToLocal = async (buffer, originalname) => {
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+  const filename = 'file-' + uniqueSuffix + path.extname(originalname);
+  const filepath = path.join(uploadsDir, filename);
+  await fs.promises.writeFile(filepath, buffer);
+  return filename;
+};
+
 module.exports = upload;
+module.exports.saveToLocal = saveToLocal;

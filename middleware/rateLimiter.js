@@ -13,13 +13,15 @@ const AUTH_MAX_REQUESTS = parseInt(process.env.AUTH_RATE_LIMIT_MAX) || 5;
 
 // Clean up old entries periodically
 setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of rateLimitStore.entries()) {
-    // Remove entries older than 1 hour
-    if (now - value.timestamp > 3600000) {
-      rateLimitStore.delete(key);
+  setImmediate(() => {
+    const now = Date.now();
+    for (const [key, value] of rateLimitStore.entries()) {
+      // Remove entries older than 1 hour
+      if (now - value.timestamp > 3600000) {
+        rateLimitStore.delete(key);
+      }
     }
-  }
+  });
 }, 300000); // Clean up every 5 minutes
 
 /**

@@ -8,6 +8,98 @@ const Logger = require('../utils/logger');
 
 const logger = new Logger('integration-controller');
 
+// @desc    Initialize integrations in database
+// @route   POST /api/integrations/initialize
+// @access  Private (Admin only)
+exports.initializeIntegrations = asyncHandler(async (req, res, next) => {
+  // Check if database is connected
+  if (!mongoose.connection.readyState) {
+    logger.warn('Database not available for initializeIntegrations request');
+    throw new APIError('Database not available', 503);
+  }
+  
+  try {
+    // Check if integrations already exist
+    const existingCount = await Integration.countDocuments();
+    
+    if (existingCount > 0) {
+      logger.info('Integrations already initialized', { count: existingCount });
+      return res.status(200).json({
+        success: true,
+        message: `${existingCount} integrations already exist`,
+        count: existingCount
+      });
+    }
+    
+    // Define default integrations
+    const defaultIntegrations = [
+      {
+        name: 'Google Drive',
+        key: 'google-drive',
+        description: 'Store and share files in the cloud',
+        icon: '/icons/google-drive.svg',
+        category: 'storage',
+        enabled: true,
+        clientId: process.env.GOOGLE_DRIVE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET,
+        scopes: ['https://www.googleapis.com/auth/drive.file'],
+        redirectUri: `${process.env.BACKEND_URL}/api/integrations/callback`
+      },
+      {
+        name: 'YouTube',
+        key: 'youtube',
+        description: 'Upload and manage videos',
+        icon: '/icons/youtube.svg',
+        category: 'video',
+        enabled: true,
+        clientId: process.env.YOUTUBE_CLIENT_ID,
+        clientSecret: process.env.YOUTUBE_CLIENT_SECRET,
+        scopes: ['https://www.googleapis.com/auth/youtube.upload'],
+        redirectUri: `${process.env.BACKEND_URL}/api/integrations/callback`
+      },
+      {
+        name: 'Facebook',
+        key: 'facebook',
+        description: 'Share posts and content',
+        icon: '/icons/facebook.svg',
+        category: 'social',
+        enabled: !!process.env.FACEBOOK_APP_ID,
+        clientId: process.env.FACEBOOK_APP_ID || 'placeholder',
+        clientSecret: process.env.FACEBOOK_APP_SECRET || 'placeholder',
+        scopes: ['public_profile', 'email'],
+        redirectUri: `${process.env.BACKEND_URL}/api/integrations/callback`
+      },
+      {
+        name: 'Instagram',
+        key: 'instagram',
+        description: 'Share photos and stories',
+        icon: '/icons/instagram.svg',
+        category: 'social',
+        enabled: !!process.env.INSTAGRAM_APP_ID,
+        clientId: process.env.INSTAGRAM_APP_ID || 'placeholder',
+        clientSecret: process.env.INSTAGRAM_APP_SECRET || 'placeholder',
+        scopes: ['user_profile', 'user_media'],
+        redirectUri: `${process.env.BACKEND_URL}/api/integrations/callback`
+      }
+    ];
+    
+    // Insert integrations
+    const integrations = await Integration.insertMany(defaultIntegrations);
+    
+    logger.info('Integrations initialized successfully', { count: integrations.length });
+    
+    res.status(201).json({
+      success: true,
+      message: `Successfully initialized ${integrations.length} integrations`,
+      count: integrations.length,
+      data: integrations
+    });
+  } catch (error) {
+    logger.error('Failed to initialize integrations', { error: error.message });
+    throw new APIError('Failed to initialize integrations', 500);
+  }
+});
+
 // @desc    Get all available integrations
 // @route   GET /api/integrations
 // @access  Private
@@ -102,14 +194,29 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
     throw new APIError(`Integration not found with id of ${integrationId}`, 404);
   }
   
+  // Construct the redirect URI from BACKEND_URL or use the stored one
+  // Priority: 1) BACKEND_URL env var, 2) stored redirectUri, 3) dynamic construction
+  const backendUrl = process.env.BACKEND_URL;
+  let redirectUri;
+  if (backendUrl) {
+    redirectUri = `${backendUrl}/api/integrations/callback`;
+  } else if (integration.redirectUri) {
+    redirectUri = integration.redirectUri;
+  } else {
+    redirectUri = `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+  }
+  
+  logger.info('OAuth redirect URI configured', { 
+    integrationKey: integration.key,
+    redirectUri,
+    source: backendUrl ? 'BACKEND_URL env' : (integration.redirectUri ? 'stored' : 'dynamic')
+  });
+  
   // Generate OAuth authorization URL
   let authUrl;
   switch (integration.key) {
     case 'google-drive':
     case 'youtube':
-      // Use the redirectUri from the integration document or construct default
-      const redirectUri = integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
-      
       // Generate state parameter for security
       const state = JSON.stringify({ 
         integrationId: integration._id.toString(),
@@ -128,9 +235,6 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
       
     case 'facebook':
     case 'instagram':
-      // Use the redirectUri from the integration document or construct default
-      const fbRedirectUri = integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
-      
       // Generate state parameter for security
       const fbState = JSON.stringify({ 
         integrationId: integration._id.toString(),
@@ -139,7 +243,7 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
       
       authUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
         `client_id=${integration.clientId}&` +
-        `redirect_uri=${encodeURIComponent(fbRedirectUri)}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
         `scope=${encodeURIComponent(integration.scopes.join(','))}&` +
         `state=${encodeURIComponent(fbState)}`;
       break;
@@ -156,7 +260,7 @@ exports.connectIntegration = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: {
-      authUrl,
+      authorizationUrl: authUrl,
       integration: {
         _id: integration._id,
         name: integration.name,
@@ -229,8 +333,23 @@ exports.handleOAuthCallback = asyncHandler(async (req, res, next) => {
     });
   }
   
-  // Use the redirectUri from the integration document or construct default
-  const redirectUri = integration.redirectUri || `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+  // Construct the redirect URI from BACKEND_URL (must match the one used in authorization request)
+  // Priority: 1) BACKEND_URL env var, 2) stored redirectUri, 3) dynamic construction
+  const backendUrl = process.env.BACKEND_URL;
+  let redirectUri;
+  if (backendUrl) {
+    redirectUri = `${backendUrl}/api/integrations/callback`;
+  } else if (integration.redirectUri) {
+    redirectUri = integration.redirectUri;
+  } else {
+    redirectUri = `${req.protocol}://${req.get('host')}/api/integrations/callback`;
+  }
+  
+  logger.info('OAuth callback redirect URI', { 
+    integrationKey: integration.key,
+    redirectUri,
+    source: backendUrl ? 'BACKEND_URL env' : (integration.redirectUri ? 'stored' : 'dynamic')
+  });
   
   try {
     // Exchange code for tokens

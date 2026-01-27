@@ -17,6 +17,42 @@ const ScheduledPostingService = require('./utils/integrations/scheduledPostingSe
 const MetricsCollectionService = require('./utils/integrations/metricsCollectionService');
 const IntegrationMonitoringService = require('./utils/integrations/integrationMonitoringService');
 
+// Function to update integration redirect URIs to match the current server port
+const updateIntegrationRedirectUrisForCurrentPort = async (currentPort) => {
+  try {
+    // Import mongoose and Integration model inside the function
+    const mongoose = require('mongoose');
+    const Integration = require('./models/Integration');
+    
+    if (!mongoose.connection.readyState) {
+      throw new Error('Database not connected');
+    }
+    
+    const backendHost = process.env.NODE_ENV === 'production' 
+      ? process.env.BACKEND_URL || `https://${require('os').hostname()}`
+      : `http://localhost:${currentPort}`;
+      
+    const redirectUri = `${backendHost}/api/integrations/callback`;
+    
+    // Update all integrations to use the current backend URL
+    const result = await Integration.updateMany(
+      {}, 
+      { 
+        $set: { 
+          redirectUri: redirectUri
+        } 
+      }
+    );
+    
+    console.log(`✅ Updated ${result.modifiedCount} integrations with current backend redirect URI: ${redirectUri}`);
+    
+    return redirectUri;
+  } catch (error) {
+    console.error('❌ Error updating redirect URIs:', error.message);
+    throw error;
+  }
+};
+
 // Initialize logger for server-level logging
 const logger = new Logger('server');
 
@@ -109,8 +145,8 @@ const initializeIntegrationsIfNeeded = async () => {
 
 // Apply rate limiting middleware globally
 // Protects against brute force and DDoS attacks
-app.use(rateLimiter);
-app.use('/api/', apiLimiter);
+// app.use(rateLimiter);
+// app.use('/api/', apiLimiter); // Temporarily disabled due to connection issues
 
 // Monitoring middleware to track performance and usage
 // Collects metrics for health checks and performance analysis
@@ -208,6 +244,13 @@ connectDB()
       
       // Initialize integrations if needed
       await initializeIntegrationsIfNeeded();
+      
+      // Update integration redirect URIs to match the current port after DB connection
+      try {
+        await updateIntegrationRedirectUrisForCurrentPort(parseInt(PORT));
+      } catch (error) {
+        logger.error('Failed to update integration redirect URIs after DB connection:', { error: error.message });
+      }
     } else {
       // Log warning when database is not available but server can still start
       logger.warn('Database connection not established - running in limited mode');
@@ -230,6 +273,7 @@ const scheduledPostingService = new ScheduledPostingService();
 const metricsCollectionService = new MetricsCollectionService();
 
 // Start integration monitoring service
+// Start integration monitoring service
 integrationMonitoringService.start();
 scheduledPostingService.start();
 metricsCollectionService.start();
@@ -243,14 +287,25 @@ const startServer = (port) => {
     process.exit(1);
   }
 
-  const server = app.listen(port, () => {
+  const server = app.listen(port, async () => {
     logger.info(`Server is running on port ${port}`);
     logger.info(`Health check endpoint: http://localhost:${port}/api/health`);
     logger.info(`Metrics endpoint: http://localhost:${port}/api/metrics`);
+    
+    // Update environment variable to reflect actual running port
+    process.env.BACKEND_URL = `http://localhost:${port}`;
+    
     if (!dbConnected) {
       logger.warn('WARNING: Database not connected!');
       logger.warn('Some features may not work properly.');
       logger.warn('Please check your MongoDB installation or database configuration.');
+    } else {
+      // Update integration redirect URIs to match the actual running port (only if DB is connected)
+      try {
+        await updateIntegrationRedirectUrisForCurrentPort(port);
+      } catch (error) {
+        logger.error('Failed to update integration redirect URIs:', { error: error.message });
+      }
     }
   });
 

@@ -34,7 +34,8 @@ const optionalVars = [
   'NODE_ENV',
   'PORT',
   'SERVE_FRONTEND',
-  'FRONTEND_URL'
+  'FRONTEND_URL',
+  'BACKEND_URL'  // Required for OAuth redirect URIs in production
 ];
 
 console.log('Validating environment variables...\n');

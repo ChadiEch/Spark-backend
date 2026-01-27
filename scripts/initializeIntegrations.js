@@ -43,8 +43,8 @@ const initializeIntegrations = async () => {
         icon: 'google-drive',
         clientId: process.env.GOOGLE_DRIVE_CLIENT_ID || 'your_google_drive_client_id',
         clientSecret: process.env.GOOGLE_DRIVE_CLIENT_SECRET || 'your_google_drive_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? 
-          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+        redirectUri: process.env.BACKEND_URL ? 
+          `${process.env.BACKEND_URL}/api/integrations/callback` : 
           'http://localhost:5001/api/integrations/callback',
         scopes: ['https://www.googleapis.com/auth/drive'],
         enabled: true
@@ -57,8 +57,8 @@ const initializeIntegrations = async () => {
         icon: 'youtube',
         clientId: process.env.YOUTUBE_CLIENT_ID || 'your_youtube_client_id',
         clientSecret: process.env.YOUTUBE_CLIENT_SECRET || 'your_youtube_client_secret',
-        redirectUri: process.env.FRONTEND_URL ? 
-          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+        redirectUri: process.env.BACKEND_URL ? 
+          `${process.env.BACKEND_URL}/api/integrations/callback` : 
           'http://localhost:5001/api/integrations/callback',
         scopes: ['https://www.googleapis.com/auth/youtube'],
         enabled: true
@@ -71,8 +71,8 @@ const initializeIntegrations = async () => {
         icon: 'facebook',
         clientId: process.env.FACEBOOK_APP_ID || 'your_facebook_app_id',
         clientSecret: process.env.FACEBOOK_APP_SECRET || 'your_facebook_app_secret',
-        redirectUri: process.env.FRONTEND_URL ? 
-          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+        redirectUri: process.env.BACKEND_URL ? 
+          `${process.env.BACKEND_URL}/api/integrations/callback` : 
           'http://localhost:5001/api/integrations/callback',
         scopes: ['pages_manage_posts', 'pages_read_engagement'],
         enabled: true
@@ -85,8 +85,8 @@ const initializeIntegrations = async () => {
         icon: 'instagram',
         clientId: process.env.INSTAGRAM_APP_ID || 'your_instagram_app_id',
         clientSecret: process.env.INSTAGRAM_APP_SECRET || 'your_instagram_app_secret',
-        redirectUri: process.env.FRONTEND_URL ? 
-          `${process.env.FRONTEND_URL.replace('/api', '')}/api/integrations/callback` : 
+        redirectUri: process.env.BACKEND_URL ? 
+          `${process.env.BACKEND_URL}/api/integrations/callback` : 
           'http://localhost:5001/api/integrations/callback',
         scopes: ['instagram_basic', 'instagram_content_publish'],
         enabled: true

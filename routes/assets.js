@@ -10,6 +10,9 @@ router.use(protect);
 // GET /api/assets - Get all assets
 router.get('/', assetController.getAssets);
 
+// GET /api/assets/:id/download - Download asset (proxy for Google Drive)
+router.get('/:id/download', assetController.downloadAsset);
+
 // GET /api/assets/:id - Get single asset
 router.get('/:id', assetController.getAsset);
 

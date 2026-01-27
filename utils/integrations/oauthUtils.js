@@ -1,6 +1,7 @@
 const axios = require('axios');
 const Integration = require('../../models/Integration');
 const IntegrationConnection = require('../../models/IntegrationConnection');
+const { decryptClientSecret } = require('./tokenEncryption');
 const Logger = require('../logger');
 
 const logger = new Logger('oauth-utils');
@@ -21,9 +22,12 @@ const exchangeCodeForTokens = async (integrationKey, code, redirectUri) => {
     }
 
     // Prepare the token exchange request
+    // Decrypt the client secret since it's stored encrypted in the database
+    const clientSecret = decryptClientSecret(integration.clientSecret);
+    
     const tokenData = {
       client_id: integration.clientId,
-      client_secret: integration.clientSecret,
+      client_secret: clientSecret,
       code,
       redirect_uri: redirectUri,
       grant_type: 'authorization_code'
@@ -72,9 +76,12 @@ const refreshOAuthTokens = async (integrationKey, refreshToken) => {
     }
 
     // Prepare the token refresh request
+    // Decrypt the client secret since it's stored encrypted in the database
+    const clientSecret = decryptClientSecret(integration.clientSecret);
+    
     const refreshData = {
       client_id: integration.clientId,
-      client_secret: integration.clientSecret,
+      client_secret: clientSecret,
       refresh_token: refreshToken,
       grant_type: 'refresh_token'
     };

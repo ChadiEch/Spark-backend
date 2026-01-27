@@ -6,6 +6,9 @@ const IntegrationConnection = require('../models/IntegrationConnection');
 
 const logger = new Logger('session-manager');
 
+// Track last refresh attempt time to avoid spamming
+const lastRefreshAttempt = {};
+
 /**
  * Refresh user authentication token
  * @param {string} refreshToken - The refresh token
@@ -57,12 +60,20 @@ const refreshAuthToken = async (refreshToken) => {
  */
 const refreshIntegrationTokens = async (userId) => {
   try {
+    // Rate limiting: Don't refresh more than once per minute per user
+    const now = Date.now();
+    const lastAttempt = lastRefreshAttempt[userId];
+    if (lastAttempt && (now - lastAttempt) < 60000) { // 1 minute
+      return;
+    }
+    lastRefreshAttempt[userId] = now;
+    
     // Find all integration connections for the user
     const connections = await IntegrationConnection.find({ userId });
     
     // Refresh tokens that are about to expire (within 24 hours)
-    const now = new Date();
-    const refreshThreshold = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+    const nowDate = new Date();
+    const refreshThreshold = new Date(nowDate.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
     
     for (const connection of connections) {
       // Check if the connection has a refresh token and is about to expire
@@ -105,11 +116,12 @@ const refreshIntegrationTokens = async (userId) => {
             userId: connection.userId 
           });
         } catch (error) {
-          logger.error('Error refreshing integration tokens', { 
+          logger.warn('Error refreshing integration tokens - this is expected if tokens have expired or are invalid', { 
             integrationId: connection.integrationId, 
             userId: connection.userId, 
             error: error.message 
           });
+          // Don't throw error, just log it as a warning since it's expected behavior for expired tokens
         }
       }
     }

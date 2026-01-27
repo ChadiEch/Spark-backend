@@ -15,14 +15,18 @@ router.get('/callback', integrationController.handleOAuthCallback);
 // All routes below are protected
 router.use(protect);
 
+// POST /api/integrations/initialize - Initialize integrations in database
+router.post('/initialize', authorize('ADMIN'), integrationController.initializeIntegrations);
+
 // GET /api/integrations - Get all available integrations
 router.get('/', integrationController.getIntegrations);
 
+// GET /api/integrations/connections - Get user's connected integrations
+// This must come BEFORE /:id route to avoid being matched as an id parameter
+router.get('/connections', integrationController.getUserConnections);
+
 // GET /api/integrations/:id - Get single integration
 router.get('/:id', integrationController.getIntegration);
-
-// GET /api/integrations/connections - Get user's connected integrations
-router.get('/connections', integrationController.getUserConnections);
 
 // POST /api/integrations/connect - Initiate connection to an integration
 router.post('/connect', integrationController.connectIntegration);

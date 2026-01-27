@@ -27,6 +27,25 @@ const AssetSchema = new mongoose.Schema({
     enum: ['IMAGE', 'VIDEO', 'DOC', 'TEMPLATE', 'GUIDELINE'],
     required: [true, 'Please specify an asset kind']
   },
+  // Storage location
+  storageType: {
+    type: String,
+    enum: ['LOCAL', 'GOOGLE_DRIVE'],
+    default: 'LOCAL'
+  },
+  // Google Drive metadata
+  driveFileId: {
+    type: String
+  },
+  thumbnailUrl: {
+    type: String
+  },
+  webViewLink: {
+    type: String
+  },
+  webContentLink: {
+    type: String
+  },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

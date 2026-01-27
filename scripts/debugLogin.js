@@ -6,14 +6,14 @@ const debugLogin = async () => {
     
     // First, let's check if the server is running
     try {
-      const statusResponse = await axios.get('http://localhost:5001/api/status');
+      const statusResponse = await axios.get('http://localhost:5002/api/status');
       console.log('Server status check:', statusResponse.status);
     } catch (error) {
       console.log('Server status check failed:', error.message);
     }
     
     // Now let's try the login
-    const response = await axios.post('http://localhost:5001/api/auth/login', {
+    const response = await axios.post('http://localhost:5002/api/auth/login', {
       email: 'admin@company.com',
       password: 'AdminPass123!'
     }, {

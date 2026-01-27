@@ -56,21 +56,26 @@ const decryptToken = (encryptedToken) => {
 };
 
 /**
- * Hash a client secret
- * @param {string} secret - The client secret to hash
- * @returns {string} - The hashed secret
+ * Encrypt a client secret (reversible - can be decrypted)
+ * @param {string} secret - The client secret to encrypt
+ * @returns {string} - The encrypted secret
  */
 const hashClientSecret = (secret) => {
   if (!secret) return secret;
   
-  try {
-    const hash = crypto.createHash('sha256');
-    hash.update(secret);
-    return hash.digest('hex');
-  } catch (error) {
-    console.error('Error hashing client secret:', error);
-    return secret; // Return original secret if hashing fails
-  }
+  // Use encryption instead of hashing so we can retrieve the original value
+  return encryptToken(secret);
+};
+
+/**
+ * Decrypt a client secret
+ * @param {string} encryptedSecret - The encrypted client secret
+ * @returns {string} - The decrypted secret
+ */
+const decryptClientSecret = (encryptedSecret) => {
+  if (!encryptedSecret) return encryptedSecret;
+  
+  return decryptToken(encryptedSecret);
 };
 
 /**
@@ -96,5 +101,6 @@ module.exports = {
   encryptToken,
   decryptToken,
   hashClientSecret,
+  decryptClientSecret,
   compareClientSecret
 };

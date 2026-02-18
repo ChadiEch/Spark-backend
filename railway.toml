@@ -3,10 +3,16 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "node server.js"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
 
 [variables]
 NODE_VERSION = "20.19.0"
 
 [env]
+NODE_ENV = "production"
+PORT = "5001"
 FRONTEND_URL = "https://spark-frontend-production.up.railway.app"
 BACKEND_URL = "https://spark-backend-production-ab14.up.railway.app"

@@ -154,12 +154,43 @@ app.use(monitoring);
 
 // CORS configuration - allow multiple origins in development
 // Restricts origins in production for security
+const getAllowedOrigins = () => {
+  const devOrigins = [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://localhost:8080', 
+    'http://localhost:8081', 
+    'http://localhost:8082', 
+    'http://localhost:8083', 
+    'http://localhost:8084',
+    'http://localhost:3000'
+  ];
+  
+  // Production origins from environment or defaults
+  const prodOrigins = [
+    process.env.FRONTEND_URL,
+    'https://spark-frontend-production.up.railway.app', 
+    'https://spark-frontend-production-ab14.up.railway.app'
+  ].filter(Boolean); // Remove undefined/null values
+  
+  return process.env.NODE_ENV === 'development' ? devOrigins : prodOrigins;
+};
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'development' 
-    ? ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:8080', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8083', 'http://localhost:8084'] // Allow requests from common development ports
-    : ['https://spark-frontend-production.up.railway.app', 'https://spark-frontend-production-ab14.up.railway.app'], // In production, explicitly allow frontend origins
+  origin: (origin, callback) => {
+    const allowedOrigins = getAllowedOrigins();
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 // Middleware setup
